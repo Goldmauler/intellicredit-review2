@@ -1,6 +1,7 @@
 # IntelliCredit: FinTech Micro-Lending Risk & Alternative Credit Scoring Engine
 
 > **Capstone Project — Business Analytics (Review 1 + Review 2)**
+> Private Review 2 repository. Review 1 lives in the team repo [Darun1017/credit-scoring-engine](https://github.com/Darun1017/credit-scoring-engine).
 > An end-to-end risk analytics engine for thin-file and gig-economy borrowers: programmatic transaction data, **live macroeconomic APIs**, interpretable default prediction, association-rule warning patterns, portfolio default forecasting, and an interactive loan-underwriter dashboard.
 
 ---
@@ -136,8 +137,8 @@ credit-scoring-engine/
 ## How to Run
 
 ```bash
-git clone https://github.com/Darun1017/credit-scoring-engine.git
-cd credit-scoring-engine
+git clone https://github.com/Goldmauler/intellicredit-review2.git   # private Review 2 repo
+cd intellicredit-review2
 python -m venv venv && venv\Scripts\activate        # macOS/Linux: source venv/bin/activate
 pip install -r requirements.txt
 
