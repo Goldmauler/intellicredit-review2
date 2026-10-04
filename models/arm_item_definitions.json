@@ -1,0 +1,142 @@
+{
+  "base_default_rate": 0.07866666666666666,
+  "derived_columns": {
+    "loan_to_income": "loan_amount_requested / avg_monthly_income",
+    "repayment_ratio": "previous_loans_repaid_on_time / previous_micro_loans (NaN if no previous loans)"
+  },
+  "items": [
+    {
+      "item": "INCOME_VOLATILE",
+      "column": "income_volatility_index",
+      "op": ">=",
+      "threshold": 0.3341,
+      "description": "income volatility in the top 25%"
+    },
+    {
+      "item": "DECLINING_INCOME",
+      "column": "income_trend_slope",
+      "op": "<",
+      "threshold": 0.0,
+      "description": "12-month income trend is negative"
+    },
+    {
+      "item": "LOW_INCOME",
+      "column": "avg_monthly_income",
+      "op": "<=",
+      "threshold": 19484.542500000003,
+      "description": "average monthly income in the bottom 25%"
+    },
+    {
+      "item": "LATE_UTILITY_PAYER",
+      "column": "utility_on_time_count",
+      "op": "<=",
+      "threshold": 7.0,
+      "description": "paid at most this many of 12 utility bills on time"
+    },
+    {
+      "item": "LONG_UTILITY_DELAYS",
+      "column": "max_utility_delay_days",
+      "op": ">=",
+      "threshold": 32.0,
+      "description": "worst utility delay in the top 25%"
+    },
+    {
+      "item": "HIGH_BNPL_BURDEN",
+      "column": "debt_to_inflow_ratio",
+      "op": ">=",
+      "threshold": 0.1426,
+      "description": "BNPL spend / income in the top 25%"
+    },
+    {
+      "item": "LOW_SAVINGS_BUFFER",
+      "column": "savings_buffer_ratio",
+      "op": "<=",
+      "threshold": 0.4824,
+      "description": "month-end balance / spending in the bottom 25%"
+    },
+    {
+      "item": "NEW_GIG_WORKER",
+      "column": "gig_tenure_months",
+      "op": "<",
+      "threshold": 6.0,
+      "description": "less than 6 months on the gig platform"
+    },
+    {
+      "item": "LOW_APP_ENGAGEMENT",
+      "column": "avg_app_logins",
+      "op": "<=",
+      "threshold": 15.92,
+      "description": "app logins in the bottom 25%"
+    },
+    {
+      "item": "IRREGULAR_RECHARGE",
+      "column": "avg_days_between_recharges",
+      "op": ">=",
+      "threshold": 29.08,
+      "description": "longest gaps between mobile recharges (top 25%)"
+    },
+    {
+      "item": "LARGE_LOAN_VS_INCOME",
+      "column": "loan_to_income",
+      "op": ">=",
+      "threshold": 4.779604755562959,
+      "description": "loan amount / monthly income in the top 25%"
+    },
+    {
+      "item": "WEAK_REPAYMENT_HISTORY",
+      "column": "repayment_ratio",
+      "op": "<",
+      "threshold": 0.7,
+      "description": "repaid < 70% of previous micro-loans on time"
+    },
+    {
+      "item": "NO_CREDIT_HISTORY",
+      "column": "previous_micro_loans",
+      "op": "==",
+      "threshold": 0.0,
+      "description": "no previous micro-loans"
+    },
+    {
+      "item": "HIGH_INTEREST_LOAN",
+      "column": "interest_rate_annual",
+      "op": ">=",
+      "threshold": 24.0,
+      "description": "annual interest rate of 24% or more"
+    },
+    {
+      "item": "YOUNG_BORROWER",
+      "column": "age",
+      "op": "<",
+      "threshold": 25.0,
+      "description": "younger than 25"
+    },
+    {
+      "item": "MANY_DEPENDENTS",
+      "column": "num_dependents",
+      "op": ">=",
+      "threshold": 3.0,
+      "description": "3 or more dependents"
+    },
+    {
+      "item": "NO_BANK_ACCOUNT",
+      "column": "has_bank_account",
+      "op": "==",
+      "threshold": 0.0,
+      "description": "no formal bank account"
+    },
+    {
+      "item": "METRO_RESIDENT",
+      "column": "location_type",
+      "op": "==",
+      "threshold": "Metro",
+      "description": "lives in a metro city"
+    },
+    {
+      "item": "RURAL_RESIDENT",
+      "column": "location_type",
+      "op": "==",
+      "threshold": "Rural",
+      "description": "lives in a rural area"
+    }
+  ]
+}
