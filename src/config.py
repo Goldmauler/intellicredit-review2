@@ -30,9 +30,9 @@ FEATURED_DATA_PATH = os.path.join(PROCESSED_DIR, "borrower_featured.csv")
 FEATURE_COLUMNS_PATH = os.path.join(PROCESSED_DIR, "feature_columns.txt")
 
 # Train/test splits (output of M3, used by M4 & M5)
-TRAIN_DATA_PATH = os.path.join(PROCESSED_DIR, "train_data.csv")
-TEST_DATA_PATH = os.path.join(PROCESSED_DIR, "test_data.csv")
-TRAIN_SMOTE_PATH = os.path.join(PROCESSED_DIR, "train_smote_data.csv")
+TRAIN_DATA_PATH = os.path.join(PROCESSED_DIR, "train.csv")
+TEST_DATA_PATH = os.path.join(PROCESSED_DIR, "test.csv")
+TRAIN_SMOTE_PATH = os.path.join(PROCESSED_DIR, "train_smote.csv")
 
 # ============================================================================
 # COLUMN DEFINITIONS
