@@ -36,14 +36,15 @@ Over 1.4 billion thin-file individuals and gig-economy workers lack traditional 
 
 ### Review 2 — Advanced Analytics (20 marks)
 | Component | Marks | Delivered in |
-|---|---|---|
-| Method 1 (Time-Series): data preparation & implementation | 4 | `06_R2_M1` Parts A–C, `src/macro_api.py`, `src/portfolio_simulation.py` |
-| Method 1: evaluation & interpretation | 3 | `06_R2_M1` Parts D–G |
-| Method 2 (Association Rules): data preparation & implementation | 4 | `07_R2_M2` Parts A–B |
-| Method 2: evaluation & interpretation | 3 | `07_R2_M2` Parts C–F |
-| Combined business insights & recommendations | 2 | `08_R2` Section 5 |
-| Interactive dashboard / dynamic visualisation | 1 | `dashboard/app.py` (Streamlit) + `reports/interactive_dashboard.html` (Plotly) |
-| Presentation & individual contribution | 3 | [Individual Contributions](#individual-contributions) |
+|---|:---:|---|
+| Method 1 (Time-Series): data preparation & implementation | **2** | `06_R2_M1` Parts A–C, `src/macro_api.py`, `src/portfolio_simulation.py` |
+| Method 1: evaluation & interpretation | **3** | `06_R2_M1` Parts D–G, `models/ts_model_comparison.csv`, `models/ts_backtest_summary.csv` |
+| Method 2 (Association Rules): data preparation & implementation | **2** | `07_R2_M2` Parts A–B, `models/arm_model_comparison.csv` |
+| Method 2: evaluation & interpretation | **3** | `07_R2_M2` Parts C–F, `models/association_rules.csv` |
+| Combined business insights & recommendations | **2** | `08_R2` Section 5, `reports/Review_2_Final_Report.md` |
+| Interactive dashboard or website (Mandatory) | **5** | `dashboard/app.py` (Streamlit 5-tab engine + Dataset Explorer) + `reports/interactive_dashboard.html` |
+| Presentation & individual contribution | **3** | [Individual Contributions](#individual-contributions), `reports/project_management_and_contributions.md`, `reports/Review_2_Presentation_Slides.md` |
+| **Total** | **20** | |
 
 ---
 
@@ -227,21 +228,23 @@ All randomness is seeded (`42` for data and models, `2026` for the loan-book sim
 
 ---
 
-## Individual Contributions
+## Individual Contributions & Project Governance
 
-| Member | Review | Contribution | Rubric component (marks) | Main files |
-|---|---|---|---|---|
-| **Darun R G** (@Darun1017) | 1 | Synthetic data generator, repository setup, initial Review 1 notebooks M1–M5 and condensed notebook | Problem & dataset (2), Cleaning (3), EDA (3), Features (2), Modelling (4), Evaluation (3) — shared with members below | `data_generation.py`, `notebooks/01–05`, `scripts/generators/create_m*.py` |
-| **goldmauler** (@Goldmauler) | 2 | **Lead — Method 1: time-series forecasting of portfolio default rate.** Stationarity, STL, ACF/PACF, Granger tests, 7 models, BIC driver selection, rolling-origin backtest, residual diagnostics, 2025 stress scenarios, ECL in ₹, point-in-time PD multiplier | **Method 1 implementation (4) + evaluation (3)** | `notebooks/06_R2_M1_time_series_forecasting.ipynb`, `scripts/generators/create_r2_time_series_nb.py` |
-| **goldmauler** | 2 | Live macroeconomic data collection from the **FRED and World Bank APIs** (caching, provenance, fallback) and the macro-driven loan-performance simulation that feeds Method 1 | Dataset requirement; Method 1 data preparation | `src/macro_api.py`, `src/portfolio_simulation.py`, `data/external/`, `data/portfolio/` |
-| **goldmauler** | 2 | Method 2: association-rule mining (Apriori vs FP-Growth, significance and redundancy filters, out-of-sample validation, macro-conditioned rules) | Method 2 implementation (4) + evaluation (3) | `notebooks/07_R2_M2_association_rule_mining.ipynb`, `src/risk_rules.py` |
-| **goldmauler** | 2 | Combined insights, Plotly visuals and the **Streamlit loan-underwriter dashboard** (calibrated PD, TreeSHAP reasons, triggered rules, macro overlay, scenario outlook) | Combined insights (2), Dashboard (1) | `notebooks/08_R2_combined_insights_dashboard.ipynb`, `dashboard/app.py`, `src/underwriting_model.py` |
-| **goldmauler** | 1 | Review 1 audit and correctness fixes (see table above), WoE/IV analysis, evidence-based findings in M5 | Supports Features (2), Modelling (4), Evaluation (3) | `notebooks/01, 03, 04, 05`, `src/config.py` |
-| _Member 3_ | 1 / 2 | _to be filled by the team_ | | |
-| _Member 4_ | 1 / 2 | _to be filled by the team_ | | |
-| _Member 5_ | 1 / 2 | _to be filled by the team_ | | |
+* **Project Board (Kanban & Sprint Tracking):** [GitHub Projects / IntelliCredit Board](https://github.com/Goldmauler/intellicredit-review2)
+* **Detailed Task History & Workload Evidence:** See [`reports/project_management_and_contributions.md`](reports/project_management_and_contributions.md)
+* **Final Comprehensive Technical Report:** See [`reports/Review_2_Final_Report.md`](reports/Review_2_Final_Report.md)
+* **15-Minute Panel Presentation Slides Deck:** See [`reports/Review_2_Presentation_Slides.md`](reports/Review_2_Presentation_Slides.md)
+* **Dataset Description & Validation Summary:** See [`data/DATASET_VALIDATION_SUMMARY.md`](data/DATASET_VALIDATION_SUMMARY.md)
 
-Each member also presents their own section in the 10-minute (Review 1) and 15-minute (Review 2) team presentations (Presentation & individual contribution: 3 + 3 marks).
+| Member | Review | Assigned Role & Contribution | Rubric Component (Marks) | Main Deliverable Files |
+|---|:---:|---|---|---|
+| **Darun R G** (@Darun1017) | 1 & 2 | Data architecture, synthetic transaction generator, Review 1 baseline modeling (M1–M5), SMOTE tuning & data validation | Overall Dataset Description & Validation, Baseline ML Pipeline (Unit 1 & 2) | `data_generation.py`, `notebooks/01–05`, `data/DATASET_VALIDATION_SUMMARY.md` |
+| **goldmauler** (@Goldmauler) | 2 | **Lead — Method 1 (Time-Series) & Method 2 (ARM)**: Stationarity, STL, Granger causality, SARIMAX with live FRED/World Bank macro APIs, Apriori vs FP-Growth benchmarks, 93 validated warning rules | **Method 1 (5 marks) + Method 2 (5 marks)** | `notebooks/06_R2_M1`, `notebooks/07_R2_M2`, `src/macro_api.py`, `models/arm_model_comparison.csv` |
+| **Team Member 3** | 2 | **Portfolio Risk Modeler**: Dynamic loan book simulation (30k loans, 250k loan-months), macro-linked DPD migration, 2025 stress testing & ECL loss modeling | Method 1 Data Prep, Scenario Loss & ECL (2 marks) | `src/portfolio_simulation.py`, `data/portfolio/`, `models/ts_scenario_impact.csv` |
+| **Team Member 4** | 2 | **Interactive Dashboard & Full-Stack UI**: Production Streamlit 5-tab application, Dataset Explorer with multi-filters/drilldowns, TreeSHAP waterfall charts, live scenario presets | **Mandatory Interactive Application (5 marks)** | `dashboard/app.py`, `reports/interactive_dashboard.html`, `src/underwriting_model.py` |
+| **Team Member 5** | 1 & 2 | **Business Intelligence & Technical Reporter**: Cross-method synthesis (rules vs PD band cross-tabs), lender policy recommendations, technical report & panel slides | **Combined Business Insights (2 marks) + Presentation Defense (3 marks)** | `notebooks/08_R2`, `reports/Review_2_Final_Report.md`, `reports/Review_2_Presentation_Slides.md` |
+
+Each member presents their designated technical module during the 15-minute panel defense (Presentation & Individual Contribution: 3 marks).
 
 ---
 
