@@ -9,16 +9,18 @@
 - **Repository**: [https://github.com/Darun1017/credit-scoring-engine](https://github.com/Darun1017/credit-scoring-engine)  
 - **Review 2 Repository**: [https://github.com/Goldmauler/intellicredit-review2](https://github.com/Goldmauler/intellicredit-review2)  
 - **Live GitHub Project Board**: `@Darun1017's credit-scoring-engine` ([View Issues & Tasks](https://github.com/Darun1017/credit-scoring-engine/issues?q=is%3Aissue))  
-- **Project Tracking Tool**: GitHub Projects (Table & Kanban View)  
-- **Structure**: 14 core project tasks tracked across Review 1 (Tasks #3–#12) and Review 2 (Tasks #13–#16).
+- **Project Tracking Tool**: GitHub Projects (Table & Kanban View with 5 Rubric Stages: *Backlog*, *To Do*, *In Progress*, *Review/Testing*, *Completed*)  
+- **Structure**: 19 comprehensive project tasks covering all requirements for Review 1 (Tasks #3–#12) and Review 2 (Tasks #13–#21).
 
 ---
 
-## 2. 14-Task Project Inventory & Sprint History
+## 2. Complete Project Task Inventory (Review 1 & Review 2)
 
-All 14 tasks are mapped directly to the GitHub Project board with assignees, status, and supporting deliverables:
+All 19 tasks are tracked directly on GitHub with assignees, status, and supporting deliverables:
 
-| Row | Task ID & Title | GitHub Issue | Assigned Team Member(s) | Status | Deliverable & Supporting Evidence |
+### Review 1 Tasks (Units 1 & 2: Data Analysis & Predictive Modelling)
+
+| Row | Task ID & Title | GitHub Issue | Assigned Member(s) | Status | Deliverable & Supporting Evidence |
 |:---:|---|:---:|---|:---:|---|
 | **1** | `[R1-M0-01] Rubric and project plan reading` | [#3](https://github.com/Darun1017/credit-scoring-engine/issues/3) | `@adii11001`, `@Darun11`, `@abhinav-juturu`, `@Goldmauler`, `@gowthamreddy285` | **Done** | Review 1 & 2 rubric analysis, scoping, sprint planning |
 | **2** | `[R1-M0-02] Repository setup, folder structure, README and config` | [#4](https://github.com/Darun1017/credit-scoring-engine/issues/4) | `@Darun11` | **Done** | Git repository architecture, `src/config.py`, requirements, folder layout |
@@ -30,27 +32,39 @@ All 14 tasks are mapped directly to the GitHub Project board with assignees, sta
 | **8** | `[R1-M5-01] Evaluation, SHAP explainability and risk cut-off notebook` | [#10](https://github.com/Darun1017/credit-scoring-engine/issues/10) | `@adii11001` | **Done** | `notebooks/05_M5_evaluation_interpretation.ipynb` (ROC 0.738, TreeSHAP, INR cost cut-off) |
 | **9** | `[R1-MX-01] Pipeline audit and correctness fixes (leakage, SMOTE, paths)` | [#11](https://github.com/Darun1017/credit-scoring-engine/issues/11) | `@adii11001`, `@Darun11`, `@abhinav-juturu`, `@Goldmauler`, `@gowthamreddy285` | **Done** | Leakage elimination, ordinal encoding alignment, reproducible random seeds |
 | **10** | `[R1-MX-02] Review 1 presentation and individual contribution summary` | [#12](https://github.com/Darun1017/credit-scoring-engine/issues/12) | `@adii11001`, `@Darun11`, `@abhinav-juturu`, `@Goldmauler`, `@gowthamreddy285` | **Done** | Review 1 presentation slides and milestone defense |
+
+---
+
+### Review 2 Tasks (Unit 3: Advanced Analytics, Dashboard & Final Panel Defense)
+
+| Row | Task ID & Title | GitHub Issue | Assigned Member(s) | Status | Deliverable & Supporting Evidence |
+|:---:|---|:---:|---|:---:|---|
 | **11** | `[R2-MX-01] Time-series data preparation (monthly default trends, macro reshape)` | [#13](https://github.com/Darun1017/credit-scoring-engine/issues/13) | `@abhinav-juturu`, `@Goldmauler` | **Done** | `src/macro_api.py` (FRED/World Bank live APIs), `src/portfolio_simulation.py` (250k panel) |
 | **12** | `[R2-MX-02] Time-series forecasting and evaluation (ARIMA/SARIMA, plots, MAE/RMSE)` | [#14](https://github.com/Darun1017/credit-scoring-engine/issues/14) | `@Goldmauler` | **Done** | `notebooks/06_R2_M1_time_series_forecasting.ipynb` (SARIMAX, 7 models, 40-origin backtest) |
 | **13** | `[R2-MX-01] Association rule mining data preparation (discretize borrower features)` | [#15](https://github.com/Darun1017/credit-scoring-engine/issues/15) | `@Darun11`, `@Goldmauler` | **Done** | 19 behavioral flags discretized on 24k training borrowers (`notebooks/07_R2_M2`) |
 | **14** | `[R2-MX-02] Association rule mining implementation and interpretation (Apriori, support/confidence/lift)` | [#16](https://github.com/Darun1017/credit-scoring-engine/issues/16) | `@Goldmauler` | **Done** | `notebooks/07_R2_M2`, 93 rules, Fisher test pruning, 100% test-lift retention on 6k unseen |
+| **15** | `[R2-MX-03] Combined business insights and recommendations (rules vs PD, macro overlay, ECL)` | [#17](https://github.com/Darun1017/credit-scoring-engine/issues/17) | `@adii11001`, `@Goldmauler` | **Done** | `notebooks/08_R2_combined_insights_dashboard.ipynb` (cross-tab heatmap, macro multipliers, 6 lender policy recommendations) |
+| **16** | `[R2-MX-04] Interactive dashboard (Streamlit underwriter engine + dataset explorer)` | [#18](https://github.com/Darun1017/credit-scoring-engine/issues/18) | `@gowthamreddy285` | **Done** | `dashboard/app.py` (5-tab live decision engine: applicant scoring, TreeSHAP, Dataset Explorer, portfolio stress testing) |
+| **17** | `[R2-MX-05] Standalone interactive HTML report and dynamic visualisations` | [#19](https://github.com/Darun1017/credit-scoring-engine/issues/19) | `@gowthamreddy285`, `@adii11001` | **Done** | `reports/interactive_dashboard.html` (browser-executable standalone risk dashboard) |
+| **18** | `[R2-MX-06] Dataset validation summary and real-world benchmarks (MFIN, PLFS, RBI)` | [#20](https://github.com/Darun1017/credit-scoring-engine/issues/20) | `@Darun11` | **Done** | `data/DATASET_VALIDATION_SUMMARY.md` Section 7: real-world benchmark validation against MFIN, PLFS, RBI, CGAP |
+| **19** | `[R2-MX-07] Review 2 final report and 15-minute panel presentation slides` | [#21](https://github.com/Darun1017/credit-scoring-engine/issues/21) | `@adii11001`, `@Darun11`, `@abhinav-juturu`, `@Goldmauler`, `@gowthamreddy285` | **Done** | `reports/Review_2_Final_Report.md` (comprehensive technical report) and `reports/Review_2_Presentation_Slides.md` (15-min panel slide deck) |
 
 ---
 
-## 3. Individual Contribution Summary across the 14 Tasks
+## 3. Individual Contribution Summary across all 19 Tasks
 
-| Team Member | GitHub Username | Assigned Core Tasks | Primary Deliverable Scope |
+| Team Member | GitHub Username | Assigned Tasks | Primary Deliverable Scope |
 |---|---|:---:|---|
-| **Darun R G** | `@Darun11` | Tasks #2, #3, #6, #13 (+ #1, #9, #10) | Data architecture, synthetic data generator, feature engineering, ARM data prep, dataset validation summary |
-| **goldmauler** | `@Goldmauler` | Tasks #7, #11, #12, #13, #14 (+ #1, #9, #10) | Lead — Predictive modeling tuning, Method 1 SARIMAX forecasting, Method 2 Association Rule Mining |
-| **Abhinav Juturu** | `@abhinav-juturu` | Tasks #5, #11 (+ #1, #9, #10) | Exploratory data analysis, statistical hypothesis testing, time-series data preparation & portfolio panel |
-| **Gowtham Reddy** | `@gowthamreddy285` | Tasks #4 (+ #1, #9, #10) | Data cleaning, preprocessing pipelines, Streamlit interactive dashboard implementation |
-| **Adithya** | `@adii11001` | Tasks #8 (+ #1, #9, #10) | Model evaluation & TreeSHAP explainability, combined insights synthesis, technical reporting & presentation |
+| **Darun R G** | `@Darun11` | Tasks #2, #3, #6, #13, #18 (+ #1, #9, #10, #19) | Data architecture, synthetic data generator, feature engineering, ARM data prep, dataset validation summary & real-world benchmarks |
+| **goldmauler** | `@Goldmauler` | Tasks #7, #11, #12, #13, #14, #15 (+ #1, #9, #10, #19) | Lead — Predictive modeling tuning, Method 1 SARIMAX forecasting, Method 2 Association Rule Mining, combined insights synthesis |
+| **Abhinav Juturu** | `@abhinav-juturu` | Tasks #5, #11 (+ #1, #9, #10, #19) | Exploratory data analysis, statistical hypothesis testing, time-series data preparation & portfolio loan book simulation |
+| **Gowtham Reddy** | `@gowthamreddy285` | Tasks #4, #16, #17 (+ #1, #9, #10, #19) | Data cleaning/preprocessing, production Streamlit interactive dashboard (`dashboard/app.py`), standalone HTML report |
+| **Adithya** | `@adii11001` | Tasks #8, #15, #17, #19 (+ #1, #9, #10) | Model evaluation & TreeSHAP explainability, combined insights synthesis, technical report & 15-minute presentation slides |
 
 ---
 
 ## 4. Verification Evidence
 
-1. **GitHub Issues & History**: All 14 tasks exist as individual issues in [`Darun1017/credit-scoring-engine`](https://github.com/Darun1017/credit-scoring-engine/issues?q=is%3Aissue).
+1. **GitHub Issues & History**: All 19 tasks exist as individual issues in [`Darun1017/credit-scoring-engine`](https://github.com/Darun1017/credit-scoring-engine/issues?q=is%3Aissue).
 2. **Board Table View**: Visible directly on `@Darun1017's credit-scoring-engine` GitHub Projects view.
 3. **Commit History**: Verifiable via Git commit logs across Review 1 (`Darun1017/credit-scoring-engine`) and Review 2 (`Goldmauler/intellicredit-review2`).
