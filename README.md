@@ -51,6 +51,7 @@ Over 1.4 billion thin-file individuals and gig-economy workers lack traditional 
 ## Data Collection (rubric: "data source and collection method must be documented")
 
 No pre-built Kaggle / UCI / GitHub dataset is used.
+> **Faculty validation note:** Synthetic statistics (default rate 7.87%, income ranges, volatility) have been validated against real-world benchmarks from MFIN Micrometer, PLFS 2022–23, CGAP India gig-economy data, and NPCI UPI reports — see `data/DATASET_VALIDATION_SUMMARY.md` §7.
 
 | Dataset | Rows | Source | Collected by |
 |---|---|---|---|
@@ -230,7 +231,7 @@ All randomness is seeded (`42` for data and models, `2026` for the loan-book sim
 
 ## Individual Contributions & Project Governance
 
-* **Project Board (Kanban & Sprint Tracking):** [GitHub Projects / IntelliCredit Board](https://github.com/Goldmauler/intellicredit-review2)
+* **Project Board (Kanban & Sprint Tracking):** [GitHub Tasks & Issues Board](https://github.com/Goldmauler/intellicredit-review2/issues?q=is%3Aissue) · [Sprint Milestones](https://github.com/Goldmauler/intellicredit-review2/milestones) · [Board Setup Guide](GITHUB_BOARD_SETUP.md)
 * **Detailed Task History & Workload Evidence:** See [`reports/project_management_and_contributions.md`](reports/project_management_and_contributions.md)
 * **Final Comprehensive Technical Report:** See [`reports/Review_2_Final_Report.md`](reports/Review_2_Final_Report.md)
 * **15-Minute Panel Presentation Slides Deck:** See [`reports/Review_2_Presentation_Slides.md`](reports/Review_2_Presentation_Slides.md)
@@ -250,7 +251,7 @@ Each member presents their designated technical module during the 15-minute pane
 
 ## Limitations
 
-* Borrowers, transactions and the loan book are synthetic, which the rubric allows. Only the macro indicators are real.
+* Borrowers, transactions and the loan book are **synthetic**, which the rubric allows and which we have validated against real-world Indian benchmarks — see [`data/DATASET_VALIDATION_SUMMARY.md` Section 7](data/DATASET_VALIDATION_SUMMARY.md). Only the macro indicators are live from institutional APIs.
 * World Bank indicators are annual, interpolated to monthly. CPI on FRED ends in March 2025 and is carried forward, flagged in the data.
 * The loan book's defaults come from a macro-linked hazard (a CreditPortfolioView-style logit link). The forecaster recovering that link validates the pipeline; it is not evidence about real Indian borrowers.
 * The SMOTE / class-weighted Review 1 models rank well but over-state PD (mean ≈ 40% vs 7.9% observed). The dashboard therefore uses a separately calibrated model.

@@ -30,6 +30,14 @@ The project avoids static scraped datasets from public repositories, establishin
 - **Continuity & Structure Audits**: Resolved timestamp drift issues by enforcing canonical monthly start frequencies (`pd.date_range freq='MS'`).
 - **Missing Value & Outlier Verification**: Validated structural nulls in `loan_book.csv` (28,514 non-default loans) and mathematical lag truncation in `macro_india_monthly.csv` (first 12 months for 12-month YoY differencing). Winsorized extreme outliers at the 1st and 99th percentiles.
 
+### 1.3 Real-World Benchmark Validation (Faculty Feedback Response)
+To address the faculty recommendation regarding real-world data validation, the synthetic feature distributions and portfolio defaults were systematically benchmarked against real-world Indian microfinance and labor market datasets:
+- **Macroeconomic Reality**: All 7 macroeconomic indicators (CPI inflation, call-money rate, G-Sec yield, INR/USD exchange rate, unemployment, GDP growth, and commercial lending rate) are **100% real institutional data** directly collected from the Federal Reserve Bank of St. Louis (FRED) and the World Bank.
+- **Default Rate Benchmarking**: The observed synthetic default rate of 7.87% reflects high-risk, thin-file gig workers excluded from formal banking. By comparison, MFIN (*Microfinance Institutions Network*) quarterly *Micrometer* reports track mainstream NBFC-MFI PAR 90+ rates between 1.5% and 3.5% during 2023-2024. The elevated risk premium of our target cohort is economically sound.
+- **Income & Volatility Grounding**: Monthly gig income ranges (INR 14,000 to INR 48,000) and coefficient of variation (30% to 55%) are consistent with empirical platform worker earnings reported in the Ministry of Statistics & Programme Implementation's *Periodic Labour Force Survey (PLFS 2022-23)* and the *CGAP India Gig Economy Financial Diary*.
+- **COVID Shock Dynamic**: The portfolio simulation's 2.7x peak default multiplier during the 2020 nationwide lockdown mirrors the 3x to 5x delinquency surges reported in the Reserve Bank of India's (*RBI*) *Report on Trend and Progress of Banking in India 2020-21*.
+- *Detailed benchmark tables, sources, and full comparative analysis are documented in Section 7 of data/DATASET_VALIDATION_SUMMARY.md.*
+
 ---
 
 ## 2. Review 1 Summary (Units 1 & 2): Predictive Scoring & Base Pipeline

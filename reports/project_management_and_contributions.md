@@ -6,9 +6,12 @@
 
 ## 1. Project Governance & Agile Kanban Board
 
-- **Repository & Project Board**: [https://github.com/Goldmauler/intellicredit-review2](https://github.com/Goldmauler/intellicredit-review2)  
+- **Repository**: [https://github.com/Goldmauler/intellicredit-review2](https://github.com/Goldmauler/intellicredit-review2)  
 - **Review 1 Repository**: [https://github.com/Darun1017/credit-scoring-engine](https://github.com/Darun1017/credit-scoring-engine)  
-- **Project Tracking Tool**: GitHub Projects / Agile Kanban Board  
+- **Live Task Tracking & Issues Board**: [GitHub Tasks & Issues (All 18 Tasks)](https://github.com/Goldmauler/intellicredit-review2/issues?q=is%3Aissue)  
+- **Sprint Milestones & Deadlines**: [GitHub Sprint Milestones (Sprints 1–4)](https://github.com/Goldmauler/intellicredit-review2/milestones)  
+- **Project Tracking Tool**: GitHub Projects & Agile Kanban Board (5 Stages: *Backlog*, *To Do*, *In Progress*, *Review/Testing*, *Completed*)  
+- **Setup Guide & Automated Creator**: See [\GITHUB_BOARD_SETUP.md\](../GITHUB_BOARD_SETUP.md) and [\create_github_board.py\](../create_github_board.py)  
 - **Methodology**: 4 two-week Sprints covering data generation, predictive modeling, advanced analytics (time series & ARM), and full-stack interactive deployment.
 
 ---

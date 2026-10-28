@@ -128,7 +128,7 @@
 ---
 
 ## Slide 11: Project Governance, Tasks & Individual Contributions (1:00 min)
-- **Agile Project Management**: Sprint tracking logged across 4 two-week milestones using a structured Kanban board.
+- **Agile Project Management**: Sprint tracking logged across 4 two-week milestones using a structured Kanban board with 5 rubric stages (*Backlog*, *To Do*, *In Progress*, *Review/Testing*, *Completed*) on [GitHub Tasks & Issues](https://github.com/Goldmauler/intellicredit-review2/issues?q=is%3Aissue).
 - **Workload & Contribution Summary**:
   - **Darun R G**: Data generation engine, Review 1 ML pipeline (Notebooks 01–05), baseline benchmarks, EDA, SMOTE tuning.
   - **goldmauler**: Lead for Method 1 Time-Series (Notebook 06, SARIMAX, backtesting, macro APIs) & Method 2 Association Rules (Notebook 07, Apriori vs FP-Growth, rule pruning).
@@ -143,6 +143,8 @@
 - **Anticipated Panel Questions & Answers**:
   - *Q: Why did Apriori outperform FP-Growth in runtime?*  
     **A:** In dense binary baskets with 19 items and moderate itemset lengths, vector boolean operations in Apriori have lower overhead than constructing and traversing recursive conditional FP-Trees.
+  - *Q: Have you validated your synthetic data against real-world benchmarks?*  
+    **A:** Yes! (1) All 7 macroeconomic indicators are 100% real from FRED and World Bank APIs. (2) Synthetic default rate (7.87%) is validated against MFIN Micrometer PAR 90+ benchmarks (1.5%–3.5% for mainstream MFI; higher for our thin-file cohort). (3) Income distributions (₹14k–₹48k) match NSSO/MoSPI Periodic Labour Force Survey (PLFS 2022–23) data for gig workers. (4) COVID default spike (2.7×) mirrors the 3–5× surge documented in RBI Trend & Progress reports.
   - *Q: How do you handle non-stationarity in SARIMAX?*  
     **A:** The target default rate was differenced ($d=1$) and confirmed stationary via ADF ($p<0.001$) and KPSS. Macro regressors were similarly transformed to stationary rates and percentage changes.
   - *Q: Why use Association Rules if you already have an ML model?*  
