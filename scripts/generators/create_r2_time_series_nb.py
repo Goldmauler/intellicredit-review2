@@ -259,7 +259,10 @@ code("""
 gc_rows = []
 for d in ['unemployment_rate', 'gdp_growth', 'cpi_inflation_yoy', 'call_money_rate', 'inr_depreciation_yoy']:
     data = pd.concat([log_y, macro[d].reindex(log_y.index)], axis=1).dropna()
-    res = grangercausalitytests(data, maxlag=4, verbose=False)
+    try:
+        res = grangercausalitytests(data, maxlag=4, verbose=False)
+    except TypeError:
+        res = grangercausalitytests(data, maxlag=4)
     p = {f'lag {k}': res[k][0]['ssr_ftest'][1] for k in res}
     gc_rows.append({'driver': d, **p, 'min p': min(p.values())})
 gc = pd.DataFrame(gc_rows).set_index('driver').round(4)
