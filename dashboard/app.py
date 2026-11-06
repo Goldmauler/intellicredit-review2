@@ -38,7 +38,7 @@ SCEN_COLORS = {"Baseline": "#4c72b0", "Adverse": "#dd8452", "Severe": "#c44e52"}
 BAND_COLORS = {"A": "#1a9850", "B": "#91cf60", "C": "#fee08b", "D": "#fc8d59", "E": "#d73027"}
 
 PRESETS = {
-    "Prime Gig Worker (Auto-Approve)": {
+    "Prime gig worker": {
         "age": 34, "gig_tenure_months": 36, "has_bank_account": 1, "num_dependents": 1,
         "location_type": "Metro", "education_level": "Undergraduate", "avg_monthly_income": 48000.0,
         "std_monthly_income": 3200.0, "income_trend_slope": 250.0, "utility_on_time_count": 12,
@@ -47,7 +47,7 @@ PRESETS = {
         "avg_app_logins": 45.0, "avg_upi_transactions": 40.0, "loan_amount_requested": 40000.0,
         "loan_tenure_months": 12, "interest_rate_annual": 16.0, "previous_micro_loans": 4, "previous_loans_repaid_on_time": 4
     },
-    "Marginal / Stressed Worker (Conditional)": {
+    "Marginal / stressed worker": {
         "age": 28, "gig_tenure_months": 8, "has_bank_account": 1, "num_dependents": 2,
         "location_type": "Semi-Urban", "education_level": "Diploma", "avg_monthly_income": 24000.0,
         "std_monthly_income": 9500.0, "income_trend_slope": -180.0, "utility_on_time_count": 8,
@@ -56,7 +56,7 @@ PRESETS = {
         "avg_app_logins": 15.0, "avg_upi_transactions": 10.0, "loan_amount_requested": 50000.0,
         "loan_tenure_months": 12, "interest_rate_annual": 20.0, "previous_micro_loans": 1, "previous_loans_repaid_on_time": 1
     },
-    "High-Risk Delinquent (Auto-Decline)": {
+    "High-risk applicant": {
         "age": 24, "gig_tenure_months": 2, "has_bank_account": 0, "num_dependents": 3,
         "location_type": "Rural", "education_level": "10th Pass", "avg_monthly_income": 14000.0,
         "std_monthly_income": 8000.0, "income_trend_slope": -350.0, "utility_on_time_count": 4,

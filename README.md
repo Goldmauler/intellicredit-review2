@@ -8,7 +8,7 @@
 
 ## Problem Statement
 
-Over 1.4 billion thin-file individuals and gig-economy workers lack traditional credit histories (FICO/CIBIL). Lenders either exclude them unfairly or lend blind and suffer high defaults. Traditional scoring ignores alternative behavioural signals, is hard to explain, and ignores macroeconomic shocks.
+1.4 billion adults worldwide are unbanked (World Bank Global Findex 2021), and India's 7.7–12 million gig and platform workers (NITI Aayog 2022; Economic Survey 2025-26) mostly have thin or no credit files (CIBIL/FICO). Lenders either exclude them unfairly or lend blind and suffer high defaults. Traditional scoring ignores alternative behavioural signals, is hard to explain, and ignores macroeconomic shocks.
 
 **IntelliCredit** answers four questions:
 
@@ -51,7 +51,7 @@ Over 1.4 billion thin-file individuals and gig-economy workers lack traditional 
 ## Data Collection (rubric: "data source and collection method must be documented")
 
 No pre-built Kaggle / UCI / GitHub dataset is used.
-> **Faculty validation note:** Synthetic statistics (default rate 7.87%, income ranges, volatility) have been validated against real-world benchmarks from MFIN Micrometer, PLFS 2022–23, CGAP India gig-economy data, and NPCI UPI reports — see `data/DATASET_VALIDATION_SUMMARY.md` §7.
+> **Review 1 feedback — "use real data":** borrower files are legally unavailable (CICRA 2005, DPDP Act 2023), so we collected **five real credit datasets from official APIs** (IMF, World Bank, FRED, CFPB HMDA, CFPB complaints — 128k+ records) and re-ran both Unit 3 methods on them in `notebooks/09_R3_real_data_validation.ipynb`. See [Real-data validation](#real-data-validation-track) and `data/DATASET_VALIDATION_SUMMARY.md` §7.
 
 | Dataset | Rows | Source | Collected by |
 |---|---|---|---|
@@ -73,6 +73,45 @@ No pre-built Kaggle / UCI / GitHub dataset is used.
 | Lending rate | **World Bank** | `FR.INR.LEND` | annual → monthly |
 
 Neither API needs a key. Each raw response is cached in `data/external/raw/`, and provenance is recorded per column in `data/external/macro_sources.json`: endpoint, series ID, whether it came live, and the last observation. **Fallback order:** live API → cached raw file → synthetic series, so the pipeline never breaks offline. COVID lockdown and second-wave months are added as event dummies taken from the public record.
+
+---
+
+## Real-Data Validation Track
+
+**Review 1 panel comment: "why synthetic data — use real data."** Borrower-level credit files in India are confidential
+(Credit Information Companies (Regulation) Act 2005, DPDP Act 2023), and the rubric forbids Kaggle/UCI copies. So we
+collected **every real credit-risk dataset that is legally open**, from official APIs, and re-ran both Unit 3 methods on it.
+
+| Real dataset | API (no key) | Rows | Used for |
+|---|---|---:|---|
+| India banks' NPL ratio, quarterly 2010-Q1 → 2026-Q2 | **IMF** Financial Soundness Indicators | 63 | Method 1 on real Indian defaults |
+| NPL ratio + GDP, unemployment, inflation, lending rate | **World Bank** WDI | 5,642 | 140-country check of the macro → default mechanism |
+| US consumer-loan delinquency + macro, 1987 → 2026 | **FRED** | 158 | conformal prediction intervals |
+| Loan-level applications with the lender's decision (2023) | **CFPB HMDA** Data Browser | 48,799 | Method 2 on real loans, fairness |
+| Payday / personal-loan complaints | **CFPB** Complaint Database | 15,000 | borrower pain points |
+
+```bash
+python -m src.real_data            # collect (cached in data/real/raw, provenance in data/real/real_sources.json)
+jupyter nbconvert --to notebook --execute --inplace notebooks/09_R3_real_data_validation.ipynb
+```
+
+| Result on real data | Number |
+|---|---|
+| India NPL ratio, 14 unseen quarters: SARIMAX + RBI regime ramps (BIC choice) | **MAE 0.48 pp** (ETS 0.91, ARIMA 1.03, naive 2.04) |
+| Adaptive conformal 80% band, 94 rolling US forecasts | **81% coverage** (Gaussian model band: 72%) |
+| 140-country panel: Δunemployment / GDP growth / inflation → ΔNPL | +0.28 / −0.11 / +0.08, all p < 0.05 — same signs as our simulation |
+| HMDA denial rules mined on DE + RI, checked on Vermont | 82 rules, **95% keep lift ≥ 1.3**, rule-count AUC 0.707 |
+| Where synthetic data was wrong | no COVID forbearance (real NPLs fell in 2020); debt burden under-weighted (real DTI≥50% lift 2.55 vs synthetic 1.12) |
+
+## Innovations
+
+1. **Conformal prediction for credit forecasts** — distribution-free intervals; Adaptive Conformal Inference (Gibbs & Candès 2021) keeps coverage through COVID where model intervals fail (notebook 09 Part B).
+2. **Regime-aware NPL forecasting for India** — RBI's Asset Quality Review, IBC clean-up and COVID standstill enter as regime ramps; they explain India's real NPL path better than macro drivers alone.
+3. **Counterfactual "path to approval"** in the dashboard — the cheapest *actionable* changes that turn a decline into an approval (`src/recourse.py`; Wachter 2017, Ustun 2019, DiCE 2020). The interest rate and immutable attributes are never used.
+4. **Synthetic-vs-real fidelity scorecard** — every mechanism the synthetic data relies on is tested on real data, and failures are reported (notebook 09 Part F, dashboard tab *Real-Data Reality Check*).
+5. **Fairness audit on real lending decisions** — adjusted denial odds by race and sex after the risk flags (HMDA).
+
+Research evidence (72 verified sources, 29 open-access PDFs, benchmark tables, reviewer answers): [`research/`](research/).
 
 ---
 
@@ -111,7 +150,9 @@ credit-scoring-engine/
 │   ├── macro_api.py                    # FRED + World Bank collector (cached, with fallback)
 │   ├── portfolio_simulation.py         # macro-driven monthly loan-performance panel
 │   ├── underwriting_model.py           # calibrated PD model + break-even decision rule
-│   └── risk_rules.py                   # applies mined warning rules to applicants
+│   ├── risk_rules.py                   # applies mined warning rules to applicants
+│   ├── real_data.py                    # IMF, World Bank, FRED, HMDA, CFPB collectors (cached, provenance)
+│   └── recourse.py                     # counterfactual path-to-approval
 ├── data/
 │   ├── borrower_profiles.csv · monthly_transactions.csv · macroeconomic_indicators.csv · data_dictionary.txt
 │   ├── processed/                      # outputs of M1 & M3 (cleaned data, train/test, SMOTE)
@@ -125,7 +166,8 @@ credit-scoring-engine/
 │   ├── 05_M5_evaluation_interpretation.ipynb
 │   ├── 06_R2_M1_time_series_forecasting.ipynb      # Review 2 · Method 1
 │   ├── 07_R2_M2_association_rule_mining.ipynb      # Review 2 · Method 2
-│   └── 08_R2_combined_insights_dashboard.ipynb     # combined insights + Plotly visuals
+│   ├── 08_R2_combined_insights_dashboard.ipynb     # combined insights + Plotly visuals
+│   └── 09_R3_real_data_validation.ipynb            # REAL data: IMF/World Bank/FRED/HMDA/CFPB + conformal
 ├── dashboard/app.py                    # Streamlit loan-underwriter dashboard
 ├── models/                             # model comparison, forecasts, rules, dashboard model
 ├── reports/                            # interactive_dashboard.html, dashboard screenshots

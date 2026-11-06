@@ -6,7 +6,7 @@
 
 ## 1. Executive Summary & Problem Context
 
-Traditional credit evaluation relies heavily on bureau scores (CIBIL, FICO) and formal salaried payslips. In India and emerging markets, over **1.4 billion gig-economy workers, delivery partners, and thin-file individuals** are excluded from formal credit or subjected to predatory rates because they lack traditional credit documentation.
+Traditional credit evaluation relies heavily on bureau scores (CIBIL, FICO) and formal salaried payslips. Worldwide **1.4 billion adults are unbanked** (World Bank Findex 2021), and India's **7.7–12 million gig and platform workers** (NITI Aayog 2022; Economic Survey 2025-26) mostly have thin credit files; they are excluded from formal credit or subjected to predatory rates because they lack traditional credit documentation.
 
 **IntelliCredit** constructs an alternative credit intelligence engine using:
 1. High-frequency digital cash flow and behavioral transaction signals.
@@ -133,7 +133,7 @@ During the development cycle, rigorous data quality checks and audits were condu
 - [x] **Data Dictionary**: Comprehensive feature definitions in `data/data_dictionary.txt` and `data/data_dictionary_review2.md`.
 - [x] **Audit Trail**: Full data transformation scripts and reproducibility seeds (`42` for data/ML, `2026` for portfolio simulation) locked.
 - [x] **Validation Across All Units**: Explicit mapping showing how raw signals translate into predictive models, time series forecasts, and association rules.
-- [x] **Real-World Benchmark Validation**: Synthetic data statistics validated against MFIN Micrometer, PLFS, RBI reports, CGAP India study, and NPCI data (Section 7).
+- [x] **Real-Data Validation**: five real credit datasets collected from IMF, World Bank, FRED and CFPB APIs; both Unit 3 methods re-run on them (notebook 09); synthetic statistics compared with verified MFIN / RBI / Findex figures only (Section 7).
 
 ---
 

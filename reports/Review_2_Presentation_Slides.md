@@ -17,7 +17,7 @@
 
 ## Slide 1: Title & Project Overview (1:00 min)
 - **Title**: IntelliCredit: Alternative Credit Scoring & Portfolio Risk Engine for Thin-File & Gig-Economy Borrowers
-- **Business Need**: Over 1.4 billion gig workers lack traditional bureau credit scores (CIBIL/FICO), facing either financial exclusion or predatory rates.
+- **Business Need**: 1.4 billion adults worldwide are unbanked (World Bank Global Findex 2021), and India's 7.7–12 million gig and platform workers (NITI Aayog 2022; Economic Survey 2025-26) mostly have thin or no credit files (CIBIL/FICO), facing either exclusion or predatory rates.
 - **The Solution**: An integrated 3-layer analytics architecture:
   1. *Unit 1 & 2*: Interpretable Machine Learning default prediction with TreeSHAP.
   2. *Unit 3 Method 1*: Macro-driven portfolio default forecasting (SARIMAX + Live FRED/World Bank APIs).
@@ -34,7 +34,7 @@
   - `macro_india_monthly.csv`: 108 monthly observations (2017–2025) live from FRED and World Bank.
   - `loan_book.csv` & `portfolio_monthly.csv`: 30,000 originated loans, 250,191 loan-months over 72 months (2019–2024).
 - **Quality Assurance**:
-  - Leak-free chronological 80/20 train/test split.
+  - Leak-free stratified 80/20 borrower split (seed 42); chronological splits for all time-series models.
   - Fixed timestamp alignment using canonical month-start frequencies (`pd.date_range`).
   - Audited null values: Verified structural nulls in `default_month` (non-defaulting loans).
 
@@ -52,9 +52,9 @@
 ## Slide 4: Method 1 — Time-Series Data Preparation & Stationarity (1:30 min)
 - **Target**: Monthly portfolio default rate over 72 consecutive months (2019–2024).
 - **Data Preparation**:
-  - Augmented Dickey-Fuller (ADF) & KPSS tests confirmed non-stationarity in levels; stationary after first-order differencing ($\Delta y_t$, $p < 0.001$).
-  - STL decomposition isolated 12-month annual seasonality and COVID-19 disruption peaks.
-  - Granger causality verified that unemployment ($p=0.008$), call-money rate ($p=0.019$), and CPI inflation ($p=0.024$) lead portfolio defaults by 2 months.
+  - ADF (p = 0.082) & KPSS (p = 0.01): non-stationary in levels; first difference stationary (ADF p < 0.001).
+  - STL: trend strength 0.46, seasonality only 0.10 — COVID peaks dominate, not the calendar.
+  - Granger (min p, lags 1–4): unemployment 0.0003, GDP 0.004, call-money 0.010, rupee 0.046; CPI borderline 0.051.
 
 ---
 
@@ -67,7 +67,7 @@
   | Holt-Winters (ETS) | 0.075 | 0.102 | 23.86% | 0.208 |
   | SARIMA (Univariate) | 0.088 | 0.102 | 29.54% | 0.176 |
   | Seasonal Naive | 0.124 | 0.164 | 40.44% | 0.351 |
-- **Residual Validation**: Ljung-Box test confirms white-noise residuals ($p=0.12$). 80% confidence interval covers 91.7% of actual 2024 observations.
+- **Residual Validation**: Ljung-Box p = 0.12 (lag 6) and 0.28 (lag 12); 80% interval covers 11/12 months of 2024.
 
 ---
 
@@ -86,8 +86,8 @@
   - Both algorithms discover identical 2,852 frequent itemsets at $\text{min\_support} = 0.005$.
   - Apriori executed in **0.62s** vs FP-Growth in **1.13s** (Apriori faster due to low array overhead on dense binary structures).
 - **Multi-Stage Pruning**:
-  - Retained rules with Confidence $\ge 15\%$, Lift $\ge 1.50$, and Bonferroni-corrected Fisher's exact $p < 0.05$.
-  - Removed subset redundancies $\implies$ Compressed to **93 high-conviction warning rules**.
+  - 21,684 rules → 242 with consequent DEFAULT → 170 pass lift ≥ 1.5, support ≥ 0.5%, Bonferroni Fisher p < 0.05.
+  - Productive-rule filter (beat every sub-rule by 5%) → **93 warning rules**.
 
 ---
 
@@ -120,9 +120,9 @@
   1. *Dataset Explorer Tab*: Interactive browsing of final evaluated dataset with multi-attribute filters (Risk Band, Gig Platform, Default Status) that dynamically update summary KPIs.
   2. *Underwriter Tab*: Live scoring with calibrated LightGBM, interactive applicant slider adjustments, real-time TreeSHAP waterfall charts, and active warning rule badges.
   3. *Live Pre-Set Scenarios*:
-     - Scenario A: Prime Gig Worker (Auto-Approve, 1.2% PD)
-     - Scenario B: Marginal Gig Worker (3 Rules Triggered, Conditional Approval in Baseline $\to$ Declined in Adverse)
-     - Scenario C: High-Risk Delinquent (7 Rules Triggered, Auto-Decline)
+     - Prime gig worker: PD 0.2% (baseline), 0 rules → APPROVE
+     - Marginal / stressed worker: PD 8.3% (baseline) vs break-even 14.5%, 13 rules → APPROVE WITH CONDITIONS; switch to Severe → PD 22% → DECLINE
+     - High-risk applicant: 75 rules; PD 21% in Baseline (conditional), 37% in Neutral and 57% in Severe → DECLINE, then show **Path to approval**
   4. *Portfolio Outlook Tab*: Interactive time-series forecast toggles, 2025 credit loss tables, and live macro indicator feeds.
 
 ---
@@ -144,8 +144,8 @@
   - *Q: Why did Apriori outperform FP-Growth in runtime?*  
     **A:** In dense binary baskets with 19 items and moderate itemset lengths, vector boolean operations in Apriori have lower overhead than constructing and traversing recursive conditional FP-Trees.
   - *Q: Have you validated your synthetic data against real-world benchmarks?*  
-    **A:** Yes! (1) All 7 macroeconomic indicators are 100% real from FRED and World Bank APIs. (2) Synthetic default rate (7.87%) is validated against MFIN Micrometer PAR 90+ benchmarks (1.5%–3.5% for mainstream MFI; higher for our thin-file cohort). (3) Income distributions (₹14k–₹48k) match NSSO/MoSPI Periodic Labour Force Survey (PLFS 2022–23) data for gig workers. (4) COVID default spike (2.7×) mirrors the 3–5× surge documented in RBI Trend & Progress reports.
+    **A:** Yes, and with real data, not only benchmarks. (1) All macro drivers are real (FRED, World Bank). (2) Notebook 09 re-runs Method 1 on India's real bank NPL ratio (IMF, 63 quarters: MAE 0.48 pp vs naive 2.04) and Method 2 on 48,799 real HMDA loans (82 rules, 95% hold in an unseen state). (3) A 140-country panel confirms the macro signs we simulate. (4) Real data also showed two weaknesses — no COVID forbearance and under-weighted debt burden — which we report openly.
   - *Q: How do you handle non-stationarity in SARIMAX?*  
-    **A:** The target default rate was differenced ($d=1$) and confirmed stationary via ADF ($p<0.001$) and KPSS. Macro regressors were similarly transformed to stationary rates and percentage changes.
+    **A:** The log default rate is non-stationary in levels, but its trend is driven by the macro regressors; with them in the model the residuals are stationary (ADF p = 0.0004), so the BIC-chosen SARIMAX(1,0,1)×(1,0,0)₁₂ needs no differencing. The univariate SARIMA, which has no drivers, uses d = 1.
   - *Q: Why use Association Rules if you already have an ML model?*  
     **A:** ML models optimize global loss and can miss localized conjunctive danger zones. Our cross-tabulation proved that within the *same* ML risk band, applicants triggering multiple rules default at $3\times$ higher rates.
