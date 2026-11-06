@@ -1,0 +1,9 @@
+attr,group,n,default,auc,mean_pd,approval,def_approved
+gender,Female,2429,0.077,0.725,0.079,0.598,0.052
+gender,Male,3442,0.079,0.754,0.079,0.608,0.051
+gender,Other,129,0.101,0.646,0.091,0.55,0.028
+location_type,Metro,1847,0.091,0.724,0.09,0.57,0.059
+location_type,Rural,539,0.061,0.763,0.059,0.705,0.042
+location_type,Semi-Urban,867,0.055,0.766,0.072,0.623,0.037
+location_type,Tier-1 City,1526,0.081,0.715,0.082,0.587,0.054
+location_type,Tier-2 City,1221,0.08,0.765,0.075,0.614,0.051
