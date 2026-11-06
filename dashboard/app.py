@@ -27,6 +27,7 @@ sys.path.insert(0, ROOT)
 
 from src.config import DATA_DIR, MODELS_DIR, RANDOM_STATE, TEST_SIZE  # noqa: E402
 from src.risk_rules import flag_items, load_rules, triggered_rules, rules_hit_count  # noqa: E402
+from src.recourse import path_to_approval  # noqa: E402
 from src.underwriting_model import (  # noqa: E402
     COST_OF_FUNDS, FEATURE_LABELS, LGD, MODEL_PATH, CARD_PATH, break_even_pd, build_features, risk_band,
 )
@@ -140,11 +141,12 @@ else:
     base["location_type"], base["education_level"] = "Tier-2 City", "Undergraduate"
 
 # ---------------------------------------------------------------------------------------------- tabs
-tab_uw, tab_data, tab_port, tab_rules, tab_model = st.tabs([
+tab_uw, tab_data, tab_port, tab_rules, tab_real, tab_model = st.tabs([
     "Underwriter Decision Engine",
     "Dataset Explorer & Drilldown",
     "Portfolio Outlook & Scenarios",
     "Delinquency Warning Rules",
+    "Real-Data Reality Check",
     "Model Card & Provenance"
 ])
 
@@ -253,6 +255,25 @@ with tab_uw:
             st.dataframe(show.style.format({"Default Rate (Unseen)": "{:.1%}", "Lift": "{:.2f}x"}), hide_index=True, width="stretch")
         else:
             st.success("No validated delinquency warning patterns match this applicant.")
+
+    # ---------------------------------------------------------------- innovation: counterfactual recourse
+    st.subheader("Path to approval (counterfactual recourse)")
+    if pd_pit >= be:
+        with st.spinner("Searching actionable changes..."):
+            recourse = path_to_approval(model, raw.iloc[0], multiplier=mult)
+        if recourse.empty:
+            st.warning("No combination of actionable changes (smaller loan, other tenure, less BNPL, better bill "
+                       "payment, more savings) brings this applicant below break-even. Refer to a secured or "
+                       "group-lending product instead.")
+        else:
+            st.write("The cheapest **different** ways this applicant could get to *profitable on average*. Only "
+                     "things the applicant can change are used; age, location, education and the interest rate are never changed.")
+            st.dataframe(recourse.style.format({"new PD": "{:.1%}", "break-even PD": "{:.1%}"}), hide_index=True, width="stretch")
+            st.caption("Counterfactual explanations (Wachter et al. 2017) restricted to actionable features "
+                       "(Ustun et al. 2019) and kept diverse (Mothilal et al. 2020). Code: src/recourse.py")
+    else:
+        st.success(f"Already approvable: PD {pd_pit:.1%} is {100 * (be - pd_pit):.1f} pp below break-even, "
+                   "so no change is needed. Switch the sidebar scenario to *Severe* to see the recourse engine work.")
 
 # ============================================================================================== TAB 2: Dataset Explorer
 with tab_data:
@@ -429,3 +450,109 @@ with tab_model:
     prov = pd.DataFrame(sources["columns"]).T.fillna("")
     st.dataframe(prov[[c for c in ["api", "series_id", "indicator_id", "origin", "last_obs", "years", "url"] if c in prov.columns]], width="stretch")
     st.caption(f"Macro series generated {sources['generated_at']}. Pipeline command: `python -m src.macro_api` -> notebooks 06-08.")
+
+
+# ============================================================================================== TAB: Real-Data Reality Check
+REAL_DIR = os.path.join(DATA_DIR, "real")
+REAL_OUT = os.path.join(MODELS_DIR, "real")
+
+
+@st.cache_data
+def load_real():
+    with open(os.path.join(REAL_OUT, "real_data_results.json"), encoding="utf-8") as f:
+        res = json.load(f)
+    with open(os.path.join(REAL_DIR, "real_sources.json"), encoding="utf-8") as f:
+        srcs = json.load(f)
+    npl = pd.read_csv(os.path.join(REAL_DIR, "india_bank_npl_quarterly.csv"), parse_dates=["quarter_start"])
+    fc = pd.read_csv(os.path.join(REAL_OUT, "india_npl_test_forecasts.csv"), index_col=0, parse_dates=True)
+    us_bt = pd.read_csv(os.path.join(REAL_OUT, "us_delinquency_rolling_forecasts.csv"), index_col=0, parse_dates=True)
+    hr = pd.read_csv(os.path.join(REAL_OUT, "hmda_denial_rules.csv"))
+    return res, srcs, npl, fc, us_bt, hr
+
+
+def aci_band(bt, alpha=0.2, gamma=0.05, warmup=12):
+    """Adaptive Conformal Inference band (Gibbs & Candes 2021) on rolling one-step log forecasts."""
+    res = np.abs(bt["y"] - bt["mu"]).values
+    lo, hi, a_t = [], [], alpha
+    for i in range(len(bt)):
+        if i < warmup:
+            lo.append(np.nan)
+            hi.append(np.nan)
+            continue
+        q = np.quantile(res[:i], min(1, max(0, 1 - a_t)))
+        lo.append(bt["mu"].iloc[i] - q)
+        hi.append(bt["mu"].iloc[i] + q)
+        a_t += gamma * (alpha - (0 if res[i] <= q else 1))
+    return np.exp(np.array(lo)), np.exp(np.array(hi))
+
+
+with tab_real:
+    st.header("Real-Data Reality Check")
+    st.caption("Review 1 feedback: *use real data*. Borrower-level credit files in India are protected (CICRA 2005, DPDP Act 2023), "
+               "so we collected every legally open real credit dataset from official APIs (`python -m src.real_data`) and re-ran "
+               "both Unit 3 methods on it (notebook 09).")
+    if not os.path.exists(os.path.join(REAL_OUT, "real_data_results.json")):
+        st.warning("Run `python -m src.real_data` and notebook 09 first.")
+    else:
+        res, srcs, npl_r, fc_r, us_bt, hr = load_real()
+        r1, r2, r3, r4 = st.columns(4)
+        r1.metric("Real records collected", f"{sum(v.get('rows', 0) for v in srcs.values()):,}")
+        best_name = res["india_best_model"]
+        r2.metric("India NPL forecast MAE (14 unseen qtrs)", f"{res['india_model_comparison'][best_name]['MAE (pp)']:.2f} pp",
+                  help=f"{best_name} vs naive {res['india_model_comparison']['Naive (last value)']['MAE (pp)']:.2f} pp")
+        r3.metric("HMDA denial rules holding out-of-state", f"{res['hmda_rules']['share_hold_out_of_state']:.0%}",
+                  help=f"{res['hmda_rules']['final']} rules mined on DE+RI, validated on Vermont")
+        r4.metric("ACI coverage, 80% band (US, 94 qtrs)", f"{res['us_interval_coverage']['80%']['adaptive conformal (ACI)']:.0%}",
+                  delta=f"Gaussian {res['us_interval_coverage']['80%']['Gaussian model interval']:.0%}", delta_color="off")
+
+        st.subheader("Method 1 on REAL Indian defaults: banks' NPL ratio (IMF Financial Soundness Indicators)")
+        model_cols = [c for c in fc_r.columns if c != "actual"]
+        show_models = st.multiselect("Forecasts to show", model_cols,
+                                     default=[c for c in model_cols if c in ("SARIMAX (BIC choice)", "Holt damped trend (ETS)", "Naive (last value)")])
+        fig = go.Figure(go.Scatter(x=npl_r["quarter_start"], y=npl_r["npl_ratio_pct"], name="Actual NPL ratio",
+                                   line=dict(color="black", width=2.5)))
+        for c in show_models:
+            fig.add_trace(go.Scatter(x=fc_r.index, y=fc_r[c], name=c, line=dict(dash="dash")))
+        for a, b, lab, col in [("2015-07-01", "2018-01-01", "RBI Asset Quality Review", "rgba(253,174,97,.25)"),
+                               ("2020-04-01", "2021-01-01", "COVID standstill", "rgba(171,217,233,.35)")]:
+            fig.add_vrect(x0=a, x1=b, fillcolor=col, line_width=0, annotation_text=lab, annotation_position="top left")
+        fig.update_layout(height=380, template="plotly_white", yaxis_title="NPLs / gross loans, %", margin=dict(l=10, r=10, t=30, b=10))
+        st.plotly_chart(fig, width="stretch")
+        st.dataframe(pd.DataFrame(res["india_model_comparison"]).T.style.format("{:.3f}"), width="stretch")
+
+        st.subheader("Innovation: adaptive conformal prediction band (real US consumer-loan delinquency, FRED)")
+        lo, hi = aci_band(us_bt)
+        figc = go.Figure([
+            go.Scatter(x=us_bt.index, y=hi, line=dict(width=0), showlegend=False, hoverinfo="skip"),
+            go.Scatter(x=us_bt.index, y=lo, fill="tonexty", fillcolor="rgba(214,96,77,.2)", line=dict(width=0), name="ACI 80% band"),
+            go.Scatter(x=us_bt.index, y=us_bt["actual"], name="Actual", line=dict(color="black")),
+            go.Scatter(x=us_bt.index, y=us_bt["forecast"], name="One-step SARIMAX forecast", line=dict(color="#d6604d", dash="dot")),
+        ])
+        figc.update_layout(height=340, template="plotly_white", yaxis_title="% of consumer loans 30+ days past due",
+                           margin=dict(l=10, r=10, t=10, b=10))
+        st.plotly_chart(figc, width="stretch")
+        st.dataframe(pd.DataFrame(res["us_interval_coverage"]).T, width="stretch")
+
+        st.subheader("Method 2 on REAL loan records: HMDA 2023 denial rules (mined on DE + RI, validated on Vermont)")
+        c1, c2 = st.columns([1.3, 1])
+        with c1:
+            min_lift = st.slider("Minimum lift in the unseen state", 1.0, 5.0, 2.0, 0.1)
+            hr_show = hr[hr["test_lift"] >= min_lift].sort_values("test_lift", ascending=False)
+            st.caption(f"{len(hr_show)} of {len(hr)} rules")
+            st.dataframe(hr_show.rename(columns={"antecedent": "Pattern => DENIED"}).style.format(
+                {"support": "{:.2%}", "confidence": "{:.1%}", "lift": "{:.2f}", "test_coverage": "{:.2%}",
+                 "test_confidence": "{:.1%}", "test_lift": "{:.2f}"}), hide_index=True, height=330, width="stretch")
+        with c2:
+            reasons = pd.Series(res["hmda_denial_reasons"]).sort_values()
+            figr = go.Figure(go.Bar(x=reasons.values, y=reasons.index, orientation="h", marker_color="#4393c3"))
+            figr.update_layout(height=330, template="plotly_white", xaxis_tickformat=".0%", title="Why real lenders deny",
+                               margin=dict(l=10, r=10, t=40, b=10))
+            st.plotly_chart(figr, width="stretch")
+
+        st.subheader("Synthetic-vs-real fidelity scorecard")
+        st.dataframe(pd.DataFrame(res["fidelity_scorecard"]), hide_index=True, width="stretch")
+        st.markdown("**Macro mechanism sign check** (does the simulation's direction match real data?)")
+        st.dataframe(pd.DataFrame(res["sign_scorecard"]).T, width="stretch")
+
+        with st.expander("Provenance of every real dataset"):
+            st.dataframe(pd.DataFrame(srcs).T[["rows", "origin", "endpoint", "fetched_at", "licence"]].astype(str), width="stretch")
