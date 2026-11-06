@@ -1,0 +1,378 @@
+{
+  "india_missing_quarters": [
+    "2010-04-01",
+    "2010-10-01",
+    "2011-04-01"
+  ],
+  "india_spec_table": [
+    {
+      "driver set": "regimes only",
+      "order": "(0, 1, 1)",
+      "BIC": "-114.55",
+      "AIC": "-124.21",
+      "test MAE (pp), shown not used": "0.482"
+    },
+    {
+      "driver set": "regimes only",
+      "order": "(1, 1, 0)",
+      "BIC": "-114.54",
+      "AIC": "-124.2",
+      "test MAE (pp), shown not used": "0.481"
+    },
+    {
+      "driver set": "regimes only",
+      "order": "(1, 1, 1)",
+      "BIC": "-110.89",
+      "AIC": "-122.48",
+      "test MAE (pp), shown not used": "0.505"
+    },
+    {
+      "driver set": "regimes + unemployment + GDP (lag 2)",
+      "order": "(0, 1, 1)",
+      "BIC": "-109.49",
+      "AIC": "-123.01",
+      "test MAE (pp), shown not used": "0.735"
+    },
+    {
+      "driver set": "regimes + unemployment + GDP (lag 2)",
+      "order": "(1, 1, 0)",
+      "BIC": "-109.47",
+      "AIC": "-122.99",
+      "test MAE (pp), shown not used": "0.733"
+    },
+    {
+      "driver set": "regimes + unemployment + GDP (lag 1)",
+      "order": "(1, 1, 0)",
+      "BIC": "-107.36",
+      "AIC": "-120.88",
+      "test MAE (pp), shown not used": "0.303"
+    },
+    {
+      "driver set": "regimes + unemployment + GDP (lag 1)",
+      "order": "(0, 1, 1)",
+      "BIC": "-107.36",
+      "AIC": "-120.89",
+      "test MAE (pp), shown not used": "0.305"
+    },
+    {
+      "driver set": "regimes + unemployment + GDP (lag 2)",
+      "order": "(1, 1, 1)",
+      "BIC": "-105.36",
+      "AIC": "-120.82",
+      "test MAE (pp), shown not used": "0.727"
+    },
+    {
+      "driver set": "regimes + unemployment + GDP (lag 1)",
+      "order": "(1, 1, 1)",
+      "BIC": "-105.34",
+      "AIC": "-120.8",
+      "test MAE (pp), shown not used": "0.202"
+    },
+    {
+      "driver set": "regimes + all four macro (lag 1)",
+      "order": "(1, 1, 0)",
+      "BIC": "-104.52",
+      "AIC": "-121.91",
+      "test MAE (pp), shown not used": "0.256"
+    },
+    {
+      "driver set": "regimes + all four macro (lag 1)",
+      "order": "(0, 1, 1)",
+      "BIC": "-104.49",
+      "AIC": "-121.87",
+      "test MAE (pp), shown not used": "0.258"
+    },
+    {
+      "driver set": "regimes + all four macro (lag 1)",
+      "order": "(1, 1, 1)",
+      "BIC": "-103.75",
+      "AIC": "-123.07",
+      "test MAE (pp), shown not used": "0.245"
+    },
+    {
+      "driver set": "macro only (lag 2)",
+      "order": "(1, 1, 0)",
+      "BIC": "-103.18",
+      "AIC": "-114.77",
+      "test MAE (pp), shown not used": "1.79"
+    },
+    {
+      "driver set": "macro only (lag 2)",
+      "order": "(1, 1, 1)",
+      "BIC": "-102.15",
+      "AIC": "-115.68",
+      "test MAE (pp), shown not used": "1.171"
+    },
+    {
+      "driver set": "regimes + all four macro (lag 2)",
+      "order": "(0, 1, 1)",
+      "BIC": "-101.93",
+      "AIC": "-119.32",
+      "test MAE (pp), shown not used": "0.801"
+    },
+    {
+      "driver set": "regimes + all four macro (lag 2)",
+      "order": "(1, 1, 0)",
+      "BIC": "-101.9",
+      "AIC": "-119.29",
+      "test MAE (pp), shown not used": "0.799"
+    },
+    {
+      "driver set": "macro only (lag 2)",
+      "order": "(0, 1, 1)",
+      "BIC": "-101.74",
+      "AIC": "-113.33",
+      "test MAE (pp), shown not used": "1.792"
+    },
+    {
+      "driver set": "regimes + all four macro (lag 2)",
+      "order": "(1, 1, 1)",
+      "BIC": "-98.1",
+      "AIC": "-117.42",
+      "test MAE (pp), shown not used": "0.729"
+    }
+  ],
+  "india_best_model": "SARIMAX (BIC choice)",
+  "india_model_comparison": {
+    "SARIMAX (BIC choice)": {
+      "MAE (pp)": 0.4819,
+      "RMSE (pp)": 0.5014,
+      "MAPE %": 18.7567,
+      "MASE": 1.2619,
+      "Bias (pp)": 0.4819
+    },
+    "Holt damped trend (ETS)": {
+      "MAE (pp)": 0.913,
+      "RMSE (pp)": 0.9614,
+      "MAPE %": 37.93,
+      "MASE": 2.3909,
+      "Bias (pp)": 0.913
+    },
+    "ARIMA(1, 1, 1)": {
+      "MAE (pp)": 1.0304,
+      "RMSE (pp)": 1.0923,
+      "MAPE %": 43.1044,
+      "MASE": 2.6983,
+      "Bias (pp)": 1.0304
+    },
+    "Naive (last value)": {
+      "MAE (pp)": 2.0361,
+      "RMSE (pp)": 2.172,
+      "MAPE %": 85.6839,
+      "MASE": 5.3323,
+      "Bias (pp)": 2.0361
+    },
+    "Drift": {
+      "MAE (pp)": 2.6059,
+      "RMSE (pp)": 2.8153,
+      "MAPE %": 110.7336,
+      "MASE": 6.8243,
+      "Bias (pp)": 2.6059
+    }
+  },
+  "india_sarimax_choice": "regimes only (0, 1, 1)",
+  "india_sarimax_effects": {
+    "aqr_recognition_ramp": {
+      "beta": "0.0766",
+      "p-value": "0.0",
+      "effect on NPL ratio": "+8.0% per quarter while active"
+    },
+    "resolution_regime_ramp": {
+      "beta": "-0.0556",
+      "p-value": "0.0188",
+      "effect on NPL ratio": "-5.4% per quarter while active"
+    },
+    "covid_standstill_ramp": {
+      "beta": "0.0619",
+      "p-value": "0.2121",
+      "effect on NPL ratio": "+6.4% per quarter while active"
+    }
+  },
+  "india_interval_coverage": {
+    "80%": {
+      "Gaussian model interval": 0.868,
+      "split conformal": 1.0,
+      "adaptive conformal (ACI)": 0.868,
+      "n forecasts": 38,
+      "mean width Gaussian (log pts)": 0.171,
+      "mean width ACI (log pts)": 0.182
+    },
+    "90%": {
+      "Gaussian model interval": 0.974,
+      "split conformal": 1.0,
+      "adaptive conformal (ACI)": 0.947,
+      "n forecasts": 38,
+      "mean width Gaussian (log pts)": 0.22,
+      "mean width ACI (log pts)": 0.234
+    }
+  },
+  "us_interval_coverage": {
+    "80%": {
+      "Gaussian model interval": 0.723,
+      "split conformal": 0.809,
+      "adaptive conformal (ACI)": 0.809,
+      "n forecasts": 94,
+      "mean width Gaussian (log pts)": 0.072,
+      "mean width ACI (log pts)": 0.089
+    },
+    "90%": {
+      "Gaussian model interval": 0.83,
+      "split conformal": 0.904,
+      "adaptive conformal (ACI)": 0.904,
+      "n forecasts": 94,
+      "mean width Gaussian (log pts)": 0.093,
+      "mean width ACI (log pts)": 0.139
+    }
+  },
+  "us_one_step_mae_pp": 0.078,
+  "us_naive_mae_pp": 0.097,
+  "panel": {
+    "countries": 140,
+    "obs": 2021,
+    "years": "2002-2025",
+    "coefficients": {
+      "d_unemp": {
+        "\u03b2 (no rate)": 0.2798,
+        "p (no rate)": 0.0145,
+        "\u03b2 (with lending rate)": 0.1391,
+        "p (with lending rate)": 0.1049
+      },
+      "gdp_growth": {
+        "\u03b2 (no rate)": -0.1107,
+        "p (no rate)": 0.0484,
+        "\u03b2 (with lending rate)": -0.0659,
+        "p (with lending rate)": 0.1678
+      },
+      "inflation_w": {
+        "\u03b2 (no rate)": 0.0803,
+        "p (no rate)": 0.0022,
+        "\u03b2 (with lending rate)": 0.0978,
+        "p (with lending rate)": 0.0057
+      },
+      "lending_rate_w": {
+        "\u03b2 (no rate)": NaN,
+        "p (no rate)": NaN,
+        "\u03b2 (with lending rate)": 0.0418,
+        "p (with lending rate)": 0.2409
+      }
+    }
+  },
+  "sign_scorecard": {
+    "GDP growth": {
+      "synthetic sim (nb 06)": "\u2212",
+      "real panel (140 countries)": "\u2212 *",
+      "real India NPL (forced-in, lag 2)": "\u2212 (n.s.)",
+      "agree with real panel?": "yes"
+    },
+    "Unemployment": {
+      "synthetic sim (nb 06)": "+",
+      "real panel (140 countries)": "+ *",
+      "real India NPL (forced-in, lag 2)": "\u2212 (n.s.)",
+      "agree with real panel?": "yes"
+    },
+    "Inflation": {
+      "synthetic sim (nb 06)": "+",
+      "real panel (140 countries)": "+ *",
+      "real India NPL (forced-in, lag 2)": "\u2212 (n.s.)",
+      "agree with real panel?": "yes"
+    },
+    "Interest rate": {
+      "synthetic sim (nb 06)": "+",
+      "real panel (140 countries)": "+ (n.s.)",
+      "real India NPL (forced-in, lag 2)": "\u2212 (n.s.)",
+      "agree with real panel?": "yes"
+    }
+  },
+  "hmda_base": {
+    "train_n": 39451,
+    "test_n": 9348,
+    "train_denial_rate": 0.1948,
+    "test_denial_rate": 0.1669
+  },
+  "hmda_rules": {
+    "itemsets": 531,
+    "candidates": 155,
+    "strong": 126,
+    "final": 82,
+    "share_hold_out_of_state": 0.951,
+    "median_train_lift": 2.899,
+    "median_test_lift": 2.787
+  },
+  "hmda_denial_reasons": {
+    "Debt-to-income ratio": 0.4294,
+    "Credit history": 0.2525,
+    "Collateral": 0.176,
+    "Other": 0.1206,
+    "Application incomplete": 0.0991,
+    "Unverifiable information": 0.0699,
+    "Insufficient cash": 0.0638,
+    "Employment history": 0.0324,
+    "Mortgage insurance denied": 0.0005
+  },
+  "hmda_rule_count_auc_VT": 0.7071,
+  "hmda_fairness_adjusted_or": {
+    "black": {
+      "adjusted odds ratio": 1.7411,
+      "p-value": 0.0
+    },
+    "asian": {
+      "adjusted odds ratio": 1.7702,
+      "p-value": 0.0
+    },
+    "race_na": {
+      "adjusted odds ratio": 1.545,
+      "p-value": 0.0
+    },
+    "female": {
+      "adjusted odds ratio": 1.0074,
+      "p-value": 0.813
+    }
+  },
+  "cfpb_top_issues": {
+    "Charged fees or interest you didn't expect": 0.2171,
+    "Problem when making payments": 0.1409,
+    "Struggling to pay your loan": 0.1037,
+    "Problem with the payoff process at the end of the loan": 0.0981,
+    "Getting the loan": 0.0842,
+    "Getting a line of credit": 0.0777,
+    "Incorrect information on your report": 0.0688,
+    "Problem with additional add-on products or services": 0.0437,
+    "Received a loan you didn't apply for": 0.0304,
+    "Can't contact lender or servicer": 0.0185
+  },
+  "cfpb_relief_share": 0.0999,
+  "cfpb_period": "2020-12-08 to 2023-08-24",
+  "fidelity_scorecard": [
+    {
+      "claim": "Macro direction: unemployment \u2191 \u21d2 defaults \u2191, GDP \u2191 \u21d2 defaults \u2193",
+      "synthetic project data": "yes (nb 06)",
+      "real data": "panel \u03b2: \u0394unemp +0.280, GDP -0.111 (140 countries)",
+      "verdict": "CONFIRMED"
+    },
+    {
+      "claim": "Default level falls 2019 \u2192 2024 as the economy recovers",
+      "synthetic project data": "0.82% \u2192 0.32%",
+      "real data": "9.0% \u2192 2.7% (corr 0.64)",
+      "verdict": "CONFIRMED"
+    },
+    {
+      "claim": "COVID 2020 default spike",
+      "synthetic project data": "\u00d72.3 (2020 vs 2019)",
+      "real data": "\u00d70.89 \u2014 moratorium & standstill hid it",
+      "verdict": "CONTRADICTED \u2192 add forbearance regime"
+    },
+    {
+      "claim": "Debt burden as a risk driver",
+      "synthetic project data": "loan-to-income flag lift 1.12",
+      "real data": "DTI \u2265 50% flag lift 2.55 (HMDA denials)",
+      "verdict": "UNDER-WEIGHTED \u2192 recalibrate generator"
+    },
+    {
+      "claim": "Multi-flag rules beat single flags & generalise out-of-sample",
+      "synthetic project data": "93 rules, 100% hold on test",
+      "real data": "82 rules, 95% hold in an unseen state",
+      "verdict": "CONFIRMED"
+    }
+  ],
+  "trend_corr_sim_vs_real": 0.64
+}

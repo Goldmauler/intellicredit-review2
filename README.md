@@ -232,31 +232,18 @@ All randomness is seeded (`42` for data and models, `2026` for the loan-book sim
 ## Individual Contributions & Project Governance
 
 * **Project Board (Kanban & Sprint Tracking):** [GitHub Project Board — @Darun1017\'s credit-scoring-engine](https://github.com/Darun1017/credit-scoring-engine/issues?q=is%3Aissue) (19 Tasks: 10 Review 1 + 9 Review 2)
-* **Detailed Task History & Workload Evidence:** See [
-eports/project_management_and_contributions.md](reports/project_management_and_contributions.md)
-* **Final Comprehensive Technical Report:** See [
-eports/Review_2_Final_Report.md](reports/Review_2_Final_Report.md)
-* **15-Minute Panel Presentation Slides Deck:** See [
-eports/Review_2_Presentation_Slides.md](reports/Review_2_Presentation_Slides.md)
+* **Detailed Task History & Workload Evidence:** See [reports/project_management_and_contributions.md](reports/project_management_and_contributions.md)
+* **Final Comprehensive Technical Report:** See [reports/Review_2_Final_Report.md](reports/Review_2_Final_Report.md)
+* **15-Minute Panel Presentation Slides Deck:** See [reports/Review_2_Presentation_Slides.md](reports/Review_2_Presentation_Slides.md)
 * **Dataset Description & Validation Summary:** See [data/DATASET_VALIDATION_SUMMARY.md](data/DATASET_VALIDATION_SUMMARY.md)
 
 | Member | GitHub Username | Assigned Tasks | Assigned Role & Contribution | Rubric Component (Marks) | Main Deliverable Files |
 |---|---|:---:|---|---|---|
-| **Darun R G** | @Darun11 / @Darun1017 | Tasks #2, #3, #6, #13, #18 (+ #1, #9, #10, #19) | Data architecture, synthetic generator, feature engineering, ARM data prep, dataset validation summary & real-world benchmarks | Overall Dataset Description & Validation, Baseline ML Pipeline (Unit 1 & 2) | data_generation.py, 
-otebooks/01-05, data/DATASET_VALIDATION_SUMMARY.md |
-| **goldmauler** | @Goldmauler | Tasks #7, #11, #12, #13, #14, #15 (+ #1, #9, #10, #19) | **Lead — Method 1 (Time-Series) & Method 2 (ARM)**: Stationarity, STL, Granger, SARIMAX with live APIs, Apriori vs FP-Growth, 93 warning rules, combined insights | **Method 1 (5 marks) + Method 2 (5 marks)** | 
-otebooks/06_R2_M1, 
-otebooks/07_R2_M2, src/macro_api.py, models/arm_model_comparison.csv |
-| **Abhinav Juturu** | @abhinav-juturu | Tasks #5, #11 (+ #1, #9, #10, #19) | **Portfolio Risk Modeler & EDA**: 38 exploratory charts, hypothesis testing, loan book simulation, macro-linked DPD migration | Method 1 Data Prep, EDA & Scenario Loss (2 marks) | src/portfolio_simulation.py, 
-otebooks/02_M2, data/portfolio/ |
-| **Gowtham Reddy** | @gowthamreddy285 | Tasks #4, #16, #17 (+ #1, #9, #10, #19) | **Interactive Dashboard & Full-Stack UI**: Data cleaning/preprocessing, production Streamlit 5-tab application, TreeSHAP waterfall charts, HTML report | **Mandatory Interactive Application (5 marks)** | dashboard/app.py, 
-otebooks/01_M1, 
-eports/interactive_dashboard.html |
-| **Adithya** | @adii11001 | Tasks #8, #15, #17, #19 (+ #1, #9, #10, #19) | **Business Intelligence & Technical Reporter**: Model evaluation, TreeSHAP explainability, combined insights synthesis, technical report & panel slides | **Combined Business Insights (2 marks) + Presentation Defense (3 marks)** | 
-otebooks/05_M5, 
-otebooks/08_R2, 
-eports/Review_2_Final_Report.md, 
-eports/Review_2_Presentation_Slides.md |
+| **Darun R G** | @Darun11 / @Darun1017 | Tasks #2, #3, #6, #13, #18 (+ #1, #9, #10, #19) | Data architecture, synthetic generator, feature engineering, ARM data prep, dataset validation summary & real-world benchmarks | Overall Dataset Description & Validation, Baseline ML Pipeline (Unit 1 & 2) | data_generation.py, notebooks/01-05, data/DATASET_VALIDATION_SUMMARY.md |
+| **goldmauler** | @Goldmauler | Tasks #7, #11, #12, #13, #14, #15 (+ #1, #9, #10, #19) | **Lead — Method 1 (Time-Series) & Method 2 (ARM)**: Stationarity, STL, Granger, SARIMAX with live APIs, Apriori vs FP-Growth, 93 warning rules, combined insights | **Method 1 (5 marks) + Method 2 (5 marks)** | notebooks/06_R2_M1, notebooks/07_R2_M2, src/macro_api.py, models/arm_model_comparison.csv |
+| **Abhinav Juturu** | @abhinav-juturu | Tasks #5, #11 (+ #1, #9, #10, #19) | **Portfolio Risk Modeler & EDA**: 38 exploratory charts, hypothesis testing, loan book simulation, macro-linked DPD migration | Method 1 Data Prep, EDA & Scenario Loss (2 marks) | src/portfolio_simulation.py, notebooks/02_M2, data/portfolio/ |
+| **Gowtham Reddy** | @gowthamreddy285 | Tasks #4, #16, #17 (+ #1, #9, #10, #19) | **Interactive Dashboard & Full-Stack UI**: Data cleaning/preprocessing, production Streamlit 5-tab application, TreeSHAP waterfall charts, HTML report | **Mandatory Interactive Application (5 marks)** | dashboard/app.py, notebooks/01_M1, reports/interactive_dashboard.html |
+| **Adithya** | @adii11001 | Tasks #8, #15, #17, #19 (+ #1, #9, #10, #19) | **Business Intelligence & Technical Reporter**: Model evaluation, TreeSHAP explainability, combined insights synthesis, technical report & panel slides | **Combined Business Insights (2 marks) + Presentation Defense (3 marks)** | notebooks/05_M5, notebooks/08_R2, reports/Review_2_Final_Report.md, reports/Review_2_Presentation_Slides.md |
 
 Each member presents their designated technical module during the 15-minute panel defense (Presentation & Individual Contribution: 3 marks).
 

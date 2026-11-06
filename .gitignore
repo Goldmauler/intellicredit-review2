@@ -19,3 +19,6 @@ models/*.pkl
 .DS_Store
 Thumbs.db
 desktop.ini
+# real-data raw caches that are large and fully re-downloadable with `python -m src.real_data --refresh`
+data/real/raw/hmda_*.csv
+data/real/raw/cfpb_*.json
