@@ -1,0 +1,11 @@
+feature,synth_mean,uci_mean,synth_std,uci_std,ks_statistic,ks_pvalue,wasserstein_normalized,fidelity_flag
+age,31.8471,35.4855,7.3524,9.2178,0.1464,0.0,0.06273,OK
+education_code,2.8901,3.9787,1.3353,1.0705,0.4236,0.0,0.21771,[WARN] HIGH
+avg_monthly_income,34427.2121,27914.0538,18491.0637,21624.2498,0.2446,0.0,0.04313,MODERATE
+income_volatility_index,0.2803,0.5906,0.0829,0.7865,0.3441,0.0,0.01691,[WARN] HIGH
+income_trend_slope,-7.5959,2631.7452,973.1031,9159.3998,0.306,0.0,0.01702,[WARN] HIGH
+utility_reliability_score,0.6888,0.4305,0.1561,0.1295,0.8242,0.0,0.25828,[WARN] HIGH
+avg_utility_delay_days,3.9085,8.4385,2.7603,18.0463,0.6254,0.0,0.04234,[WARN] HIGH
+max_utility_delay_days,23.2839,20.466,15.428,32.205,0.6254,0.0,0.06908,[WARN] HIGH
+debt_to_inflow_ratio,0.1133,0.3729,0.1138,0.3497,0.4292,0.0,0.13397,[WARN] HIGH
+savings_buffer_ratio,0.5844,0.3704,0.1512,0.5907,0.6617,0.0,0.07821,[WARN] HIGH
