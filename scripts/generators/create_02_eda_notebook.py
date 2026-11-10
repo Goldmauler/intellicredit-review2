@@ -1,3 +1,6 @@
+"""Builds notebooks/02_M2_exploratory_data_analysis.ipynb (Review 1 - Member 2: EDA and visualisation).
+
+Run from the repository root; the notebook is written by nbformat and is not executed here."""
 import nbformat
 import os
 
