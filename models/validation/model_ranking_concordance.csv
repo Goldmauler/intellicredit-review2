@@ -1,0 +1,5 @@
+real_dataset,spearman_model_ranking,best_on_real,best_on_synthetic,lr_to_best_gap_real,lr_to_best_gap_synth
+german,1.0,XGBoost,XGBoost,0.013871428571428424,0.005938028894503011
+gmsc,0.7999999999999999,LightGBM (IntelliCredit recipe),XGBoost,0.013707400019680405,0.005938028894503011
+heloc,1.0,XGBoost,XGBoost,0.003064343378894163,0.005938028894503011
+taiwan,0.39999999999999997,LightGBM (IntelliCredit recipe),XGBoost,0.060581862957793886,0.005938028894503011

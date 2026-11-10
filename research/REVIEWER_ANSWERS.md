@@ -21,7 +21,7 @@ Evidence:
 Evidence and the checks to show:
 - **Fidelity metrics:** per-column distribution similarity and pairwise correlation similarity (SDV/SDMetrics) [17]; **TSTR**, which trains on synthetic data and tests on real data, is the evaluation idea from Esteban et al. [16] and is named by the FCA for synthetic-data model validation [15].
 - **Aggregate anchors (verified):** gig workers 7.7M in FY21 rising to 12M in FY25, with about 40% earning under ₹15k/month and many having thin-file credit histories [64][65]. MFI PAR 31–180 was 2.2% (Mar 2024), 6.3% (Mar 2025) and 1.6% (Jun 2026) [67]. Our 7.87% default rate is deliberately above MFI levels because the segment is excluded from mainstream MFIs.
-- **Be honest:** our simulated COVID spike (×2.7) has no RBI benchmark. Reported bank GNPA actually *fell* from 8.2% to 7.3% in FY21 because of the moratorium and write-offs [63]. Present the spike as a stress assumption.
+- **Be honest:** our simulated COVID spike (2.3× the 2019 level over 2020, 6× in the peak month) has no RBI benchmark. Reported bank GNPA actually *fell* from 8.2% to 7.3% in FY21 because of the moratorium and write-offs [63]. Present the spike as a stress assumption.
 - **AUC realism check:** real alternative-data AUCs range from 0.60 (Indian fintech [4]) to 0.74 (Germany, footprint plus bureau [1]). Our 0.738 is at the top of that range, consistent with clean synthetic signal.
 
 ## Q3. "Where is the real data?"

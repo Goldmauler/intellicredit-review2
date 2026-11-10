@@ -35,12 +35,12 @@ Compiled 2026-11-06 by SCOUT. Reference numbers follow `REFERENCES_ACM.md`. Only
 | Quantity | Real value | Source | Synthetic or model value | Comment |
 |---|---|---|---|---|
 | India bank NPL ratio | 9.98% (2017 peak) → 2.06% (2025) | World Bank FB.AST.NPER.ZS [70] | — | Target for the real NPL-panel model (track a) |
-| SCB GNPA | 8.2% (Mar 2020) → 7.3% (Mar 2021) | RBI T&P 2020-21 [63] | Simulated COVID default spike ×2.7 | **Real bank NPLs fell during COVID** because of the moratorium, restructuring and write-offs. The spike is an assumption, not a benchmark. |
+| SCB GNPA | 8.2% (Mar 2020) → 7.3% (Mar 2021) | RBI T&P 2020-21 [63] | Simulated COVID default spike: 2.3× the 2019 level over calendar 2020; 6× in the peak month (Jun 2020, 4.9% vs 0.82%) | **Real bank NPLs fell during COVID** because of the moratorium, restructuring and write-offs. The spike is an assumption, not a benchmark. |
 | SCB GNPA | 1.8% (Mar 2026) | RBI FSR Jun 2026 [61] | — | Context |
 | Microfinance PAR 31–180 | 2.2% (Mar 2024), 6.3% (Mar 2025), 1.6% (Jun 2026) | MFIN Micrometer [67] | Default rate 7.87% | Ours is deliberately higher (thin-file segment). The 2025 MFI stress episode shows real delinquency can triple within a year. |
 | US credit-card delinquency / charge-off | 2.85% / 3.82% (Q2 2026) | FRED / Fed Board [71] | — | Target series for conformal forecasting (track b) |
 | US consumer-loan delinquency | 2.62% (Q2 2026) | FRED DRCLACBS [71] | — | Second target series |
-| Gig worker income | about 40% earn < ₹15,000/month | Economic Survey 2025-26 [65] | Synthetic range ₹14k–48k | A fidelity check: compute the share of synthetic gig borrowers below ₹15k and compare with about 40%. |
+| Gig worker income | about 40% earn < ₹15,000/month | Economic Survey 2025-26 [65] | Synthetic: median ₹31.5k, 5th–95th percentile ₹9.9k–₹68.8k; only 15.2% of borrowers earn under ₹15k | Checked 2026-11-09: the synthetic data has far fewer low earners than the real ~40%, so it is optimistic on income. |
 
 ## How to use these tables honestly
 

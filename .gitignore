@@ -22,3 +22,6 @@ desktop.ini
 # real-data raw caches that are large and fully re-downloadable with `python -m src.real_data --refresh`
 data/real/raw/hmda_*.csv
 data/real/raw/cfpb_*.json
+
+# Public benchmark datasets are downloaded on demand by scripts/run_validation_suite.py (licences differ); not redistributed
+data/real/benchmarks/

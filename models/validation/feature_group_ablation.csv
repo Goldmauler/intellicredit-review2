@@ -1,0 +1,9 @@
+feature_group,model,n_features,auc,auc_sd
+Application form only,Logistic scorecard,10,0.7013370299737546,0.01185258601350348
+Application form only,LightGBM (IntelliCredit recipe),10,0.6993309101277931,0.010812859268077417
+Application form + past loans,Logistic scorecard,12,0.7015240593342981,0.012009571195862429
+Application form + past loans,LightGBM (IntelliCredit recipe),12,0.700545987760308,0.009574601580317348
+Alternative data only,Logistic scorecard,10,0.7227817091417499,0.01488439653563265
+Alternative data only,LightGBM (IntelliCredit recipe),10,0.7295521719934264,0.013724236071709346
+Everything (IntelliCredit),Logistic scorecard,22,0.7430307034756802,0.013550335972517022
+Everything (IntelliCredit),LightGBM (IntelliCredit recipe),22,0.7484138530501117,0.013437348388058138

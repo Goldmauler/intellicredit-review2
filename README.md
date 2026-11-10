@@ -51,7 +51,7 @@
 ## Data Collection (rubric: "data source and collection method must be documented")
 
 No pre-built Kaggle / UCI / GitHub dataset is used.
-> **Review 1 feedback — "use real data":** borrower files are legally unavailable (CICRA 2005, DPDP Act 2023), so we collected **five real credit datasets from official APIs** (IMF, World Bank, FRED, CFPB HMDA, CFPB complaints — 128k+ records) and re-ran both Unit 3 methods on them in `notebooks/09_R3_real_data_validation.ipynb`. See [Real-data validation](#real-data-validation-track) and `data/DATASET_VALIDATION_SUMMARY.md` §7.
+> **Review 1 feedback — "use real data":** borrower files are legally unavailable (CICRA 2005, DPDP Act 2023), so we collected **five real credit datasets from official APIs** (IMF, World Bank, FRED, CFPB HMDA, CFPB complaints — 69,662 records) and re-ran both Unit 3 methods on them in `notebooks/09_R3_real_data_validation.ipynb`. See [Real-data validation](#real-data-validation-track) and `data/DATASET_VALIDATION_SUMMARY.md` §7.
 
 | Dataset | Rows | Source | Collected by |
 |---|---|---|---|
@@ -293,7 +293,7 @@ Each member presents their designated technical module during the 15-minute pane
 
 ## Limitations
 
-* Borrowers, transactions and the loan book are **synthetic**, which the rubric allows and which we have validated against real-world Indian benchmarks — see [`data/DATASET_VALIDATION_SUMMARY.md` Section 7](data/DATASET_VALIDATION_SUMMARY.md). Only the macro indicators are live from institutional APIs.
+* Borrowers, transactions and the loan book are **synthetic**, which the rubric allows. We compared them with verified real-world anchors where sources exist, and Section 7 of [`data/DATASET_VALIDATION_SUMMARY.md`](data/DATASET_VALIDATION_SUMMARY.md) states where the synthetic data does **not** match (fewer low earners than the Economic Survey reports, and a COVID default spike that real bank NPLs did not show). Only the macro indicators are live from institutional APIs.
 * World Bank indicators are annual, interpolated to monthly. CPI on FRED ends in March 2025 and is carried forward, flagged in the data.
 * The loan book's defaults come from a macro-linked hazard (a CreditPortfolioView-style logit link). The forecaster recovering that link validates the pipeline; it is not evidence about real Indian borrowers.
 * The SMOTE / class-weighted Review 1 models rank well but over-state PD (mean ≈ 40% vs 7.9% observed). The dashboard therefore uses a separately calibrated model.

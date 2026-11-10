@@ -1,0 +1,23 @@
+concept,expected,synthetic_feature,synthetic_rho,synthetic_auc,real_dataset,real_feature,real_rho,real_auc,real_matches_expected,synthetic_matches_expected,synthetic_flat
+Younger borrowers default more,-,age,-0.019976818465009646,0.47860682289239376,gmsc,Age,-0.11703396072688933,0.36474881505379797,True,False,True
+Younger borrowers default more,-,age,-0.019976818465009646,0.47860682289239376,taiwan,Age,0.005148863519844661,0.5035788181103027,False,False,True
+Younger borrowers default more,-,age,-0.019976818465009646,0.47860682289239376,german,Age,-0.11219103554757161,0.4293666666666667,True,False,True
+Higher income / credit capacity lowers default,-,avg_monthly_income,0.09187666918230383,0.5985169261571293,gmsc,Monthly income,-0.06697975297850192,0.4239614005125294,True,False,False
+Higher income / credit capacity lowers default,-,avg_monthly_income,0.09187666918230383,0.5985169261571293,taiwan,Credit limit (income proxy),-0.16958627777128973,0.3821973573301078,True,False,False
+More dependents raise default,+,num_dependents,0.00047661565198755683,0.5004998206357771,gmsc,Dependents,0.04597224536609987,0.5467740512525952,True,False,True
+More dependents raise default,+,num_dependents,0.00047661565198755683,0.5004998206357771,german,Dependents,-0.003014853083344694,0.4988095238095238,False,False,True
+Late payments predict default (count / severity),+,avg_utility_delay_days,0.11297249580900633,0.6211279096862813,gmsc,Times 90+ days late,0.3423494222095594,0.6571035091721218,True,True,False
+Late payments predict default (count / severity),+,avg_utility_delay_days,0.11297249580900633,0.6211279096862813,taiwan,Latest repayment delay,0.2922132153119903,0.68971016999203,True,True,False
+Late payments predict default (count / severity),+,avg_utility_delay_days,0.11297249580900633,0.6211279096862813,heloc,Trades ever 90+ late,0.17637251086024366,0.574425880054081,True,True,False
+A high on-time payment share protects,-,utility_reliability_score,-0.14792119581247362,0.3433632324805612,heloc,% trades never delinquent,-0.28261291122501164,0.3452531687210308,True,True,False
+A high on-time payment share protects,-,utility_reliability_score,-0.14792119581247362,0.3433632324805612,taiwan,Share of bills repaid,-0.14308111033446355,0.40049150978940723,True,True,False
+Heavy debt burden raises default,+,debt_to_inflow_ratio,-0.022446357798318835,0.47593137555495596,gmsc,Revolving utilisation,0.24037817700357894,0.7777511434962541,True,False,True
+Heavy debt burden raises default,+,debt_to_inflow_ratio,-0.022446357798318835,0.47593137555495596,gmsc,Debt ratio,0.020596833224552965,0.5238072411561338,True,False,True
+Heavy debt burden raises default,+,debt_to_inflow_ratio,-0.022446357798318835,0.47593137555495596,heloc,Revolving burden,0.35176675431622456,0.7031392518803464,True,False,True
+Heavy debt burden raises default,+,debt_to_inflow_ratio,-0.022446357798318835,0.47593137555495596,taiwan,Card utilisation,0.07297330691889616,0.5507461086534783,True,False,True
+Heavy debt burden raises default,+,debt_to_inflow_ratio,-0.022446357798318835,0.47593137555495596,german,Instalment / income,0.07368975726873596,0.5433833333333333,True,False,True
+A bigger loan relative to means raises default,+,loan_to_income,0.05049273447356132,0.5541420258039197,german,Credit amount,0.08708308137407497,0.5548571428571429,True,True,False
+A bigger loan relative to means raises default,+,loan_to_income,0.05049273447356132,0.5541420258039197,german,Duration (months),0.2056846271614897,0.6285928571428572,True,True,False
+A longer track record lowers default,-,gig_tenure_months,-0.15317340071493007,0.3359063488802767,heloc,Average months on file,-0.26098730695652433,0.34920230963824106,True,True,False
+A longer track record lowers default,-,gig_tenure_months,-0.15317340071493007,0.3359063488802767,heloc,Months since oldest trade,-0.2238564808354799,0.370655503916139,True,True,False
+A savings / repayment buffer lowers default,-,savings_buffer_ratio,-0.08059424216805437,0.4135809223920135,taiwan,Share of bills repaid,-0.14308111033446355,0.40049150978940723,True,True,False

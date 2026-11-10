@@ -1,0 +1,12 @@
+concept,expected_direction,synthetic_feature,synthetic_rho,real_checks,real_agree_with_expected,real_rho_range,verdict
+Younger borrowers default more,"higher value, lower default",age,-0.019976818465009646,3,2,-0.12 to +0.01,Negligible in synthetic data
+Higher income / credit capacity lowers default,"higher value, lower default",avg_monthly_income,0.09187666918230383,2,2,-0.17 to -0.07,Opposite direction
+More dependents raise default,"higher value, higher default",num_dependents,0.00047661565198755683,2,1,-0.00 to +0.05,Negligible in synthetic data
+Late payments predict default (count / severity),"higher value, higher default",avg_utility_delay_days,0.11297249580900633,3,3,+0.18 to +0.34,Same direction
+A high on-time payment share protects,"higher value, lower default",utility_reliability_score,-0.14792119581247362,2,2,-0.28 to -0.14,Same direction
+Heavy debt burden raises default,"higher value, higher default",debt_to_inflow_ratio,-0.022446357798318835,5,5,+0.02 to +0.35,Negligible in synthetic data
+A bigger loan relative to means raises default,"higher value, higher default",loan_to_income,0.05049273447356132,2,2,+0.09 to +0.21,Same direction
+A longer track record lowers default,"higher value, lower default",gig_tenure_months,-0.15317340071493007,2,2,-0.26 to -0.22,Same direction
+A savings / repayment buffer lowers default,"higher value, lower default",savings_buffer_ratio,-0.08059424216805437,1,1,-0.14 to -0.14,Same direction
+Income instability raises default,"higher value, higher default",income_volatility_index,0.12437076954022104,0,0,n/a,Cannot be tested: No public real credit dataset records income volatility.
+Many recent credit enquiries raise default,"higher value, higher default",,,0,0,n/a,"Cannot be tested: HELOC shows it (NumInqLast6M), but the synthetic data has no enquiry feature."

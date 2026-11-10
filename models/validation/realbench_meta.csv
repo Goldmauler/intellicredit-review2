@@ -1,0 +1,6 @@
+dataset,label,country,product,year,n,features,default_rate,target,source
+german,German credit (UCI Statlog),Germany,Instalment loans,1994,1000,61,0.3,class = bad,UCI / OpenML 31
+taiwan,Taiwan credit cards (UCI),Taiwan,Credit cards,2005,30000,23,0.2212,default next month,UCI / OpenML 42477
+gmsc,Give Me Some Credit (Kaggle),United States,Consumer credit,2011,150000,10,0.06684,90+ days late within 2 years,Kaggle / OpenML 46929
+heloc,FICO HELOC (xML Challenge),United States,Home-equity lines,2018,10459,23,0.5219428243617936,90+ days late within 2 years,FICO / OpenML 46932
+intellicredit,IntelliCredit (synthetic),India (simulated),Gig-worker micro-loans,2018-2024,30000,22,0.07866666666666666,90+ days past due,data_generation.py
