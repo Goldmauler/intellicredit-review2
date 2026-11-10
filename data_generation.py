@@ -30,6 +30,7 @@ from faker import Faker
 import warnings
 import time
 
+# Seeds are fixed (numpy + Faker) so regenerating the dataset reproduces identical CSVs
 warnings.filterwarnings("ignore")
 np.random.seed(42)
 fake = Faker("en_IN")
@@ -38,10 +39,11 @@ Faker.seed(42)
 # ============================================================================
 # CONFIGURATION
 # ============================================================================
-NUM_BORROWERS = 30000
-NUM_MONTHS = 12
+NUM_BORROWERS = 30000   # one profile per borrower
+NUM_MONTHS = 12         # months of transaction history per borrower
 OUTPUT_DIR = os.environ.get("INTELLICREDIT_DATA_DIR", os.path.join(os.path.dirname(os.path.abspath(__file__)), "data"))
 
+# Gig-economy work categories a borrower can be active on (drawn uniformly)
 GIG_PLATFORMS = [
     "Ride-Hailing (Uber/Ola)",
     "Food Delivery (Swiggy/Zomato)",
@@ -54,15 +56,18 @@ GIG_PLATFORMS = [
 ]
 
 LOCATION_TYPES = ["Metro", "Tier-1 City", "Tier-2 City", "Semi-Urban", "Rural"]
+# sampling probabilities follow LOCATION_TYPES order; multipliers scale income and bill sizes
 LOCATION_WEIGHTS = [0.30, 0.25, 0.20, 0.15, 0.10]
 LOCATION_MULTIPLIERS = {"Metro": 1.4, "Tier-1 City": 1.2, "Tier-2 City": 1.0, "Semi-Urban": 0.8, "Rural": 0.6}
 
 EDUCATION_LEVELS = ["Below 10th", "10th Pass", "12th Pass", "Diploma", "Undergraduate", "Postgraduate"]
+# sampling probabilities follow EDUCATION_LEVELS order; multipliers scale earning power
 EDUCATION_WEIGHTS = [0.05, 0.10, 0.25, 0.20, 0.30, 0.10]
 EDUCATION_MULTIPLIERS = {"Below 10th": 0.7, "10th Pass": 0.8, "12th Pass": 0.9, "Diploma": 1.0, "Undergraduate": 1.1, "Postgraduate": 1.25}
 
 
 def main():
+    """Generate borrowers, monthly transactions, macro series and the data dictionary into OUTPUT_DIR."""
     start_time = time.time()
     print("=" * 70)
     print("  IntelliCredit - Synthetic Data Generation Pipeline (Vectorized)")
@@ -78,6 +83,7 @@ def main():
     # ==================================================================
     print(f"[1/6] Generating {n:,} borrower demographic profiles...")
 
+    # identifiers and demographics (names come from the en_IN Faker locale)
     borrower_ids = np.array([f"BRW-{str(i).zfill(6)}" for i in range(1, n + 1)])
     borrower_names = np.array([fake.name() for _ in range(n)])
 

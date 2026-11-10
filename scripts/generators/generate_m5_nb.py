@@ -1,3 +1,6 @@
+"""Builds notebooks/05_M5_evaluation_interpretation.ipynb (Review 1 - Member 5: evaluation, interpretation, recommendations).
+
+Run from the repository root; the notebook is written by nbformat and is not executed here."""
 import os
 import nbformat as nbf
 

@@ -1,3 +1,6 @@
+"""Builds notebooks/04_M4_predictive_modeling.ipynb (Review 1 - Member 4: predictive model development).
+
+Run from the repository root; the notebook is written by nbformat and is not executed here."""
 import nbformat as nbf
 import os
 

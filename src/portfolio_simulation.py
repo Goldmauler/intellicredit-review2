@@ -46,7 +46,7 @@ LOAN_BOOK_PATH = os.path.join(PORTFOLIO_DIR, "loan_book.csv")
 LOAN_PERFORMANCE_PATH = os.path.join(PORTFOLIO_DIR, "loan_performance.csv")
 PORTFOLIO_MONTHLY_PATH = os.path.join(PORTFOLIO_DIR, "portfolio_monthly.csv")
 
-SEED = 2026
+SEED = 2026  # separate from RANDOM_STATE so the panel draw is independent of the train/test split
 ORIGINATION_START, WINDOW_START, WINDOW_END = "2018-07-01", "2019-01-01", "2024-12-01"
 
 STRESS_WEIGHTS = {            # sign: + means "higher value = more stress"
@@ -86,14 +86,17 @@ def age_hazard(k):
 
 
 def logit(p):
+    """Log-odds transform (inverse of expit)."""
     return np.log(p / (1 - p))
 
 
 def expit(x):
+    """Logistic sigmoid (inverse of logit)."""
     return 1 / (1 + np.exp(-x))
 
 
 def simulate(seed=SEED):
+    """Run the Monte-Carlo loan panel; returns (loan_book, loan_performance, portfolio_monthly) DataFrames."""
     rng = np.random.default_rng(seed)
     borrowers = pd.read_csv(BORROWER_PROFILES_PATH)
     macro = pd.read_csv(MACRO_MONTHLY_PATH, parse_dates=["date"])
@@ -125,6 +128,7 @@ def simulate(seed=SEED):
     emi = principal * rate_m * (1 + rate_m) ** tenure / ((1 + rate_m) ** tenure - 1)
     pd_rel = pd_ttc / pd_ttc.mean()
 
+    # one pass per loan: walk its instalments month by month until maturity, default or window end
     perf_rows = []
     book_rows = []
     for i in range(n):
@@ -175,6 +179,7 @@ def simulate(seed=SEED):
                 default_idx = ci
                 break
 
+        # still running at the end of the window and not defaulted -> right-censored
         censored = int(o + T > last_idx and default_idx is None)
         book_rows.append((i, o, T, default_idx, censored))
 
@@ -202,7 +207,7 @@ def simulate(seed=SEED):
     perf.insert(1, "month", month_str[perf["month_idx"]])
     perf = perf.drop(columns=["i"])
 
-    # monthly portfolio KPIs
+    # monthly portfolio KPIs: counts of loans by DPD bucket, then rates over active loans
     g = perf.groupby("month_idx")
     monthly = pd.DataFrame({
         "active_loans": g.size(),

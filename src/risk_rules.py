@@ -17,13 +17,16 @@ from src.config import MODELS_DIR
 ITEM_DEFS_PATH = os.path.join(MODELS_DIR, "arm_item_definitions.json")
 RULES_PATH = os.path.join(MODELS_DIR, "association_rules.csv")
 
+# Maps the operator strings stored in arm_item_definitions.json to vectorised comparisons
 _OPS = {">=": np.greater_equal, "<=": np.less_equal, "<": np.less, ">": np.greater, "==": np.equal}
 
 
 def load_rules():
+    """Load item definitions (JSON) and mined rules (CSV); adds an `items` list column per rule."""
     with open(ITEM_DEFS_PATH) as f:
         item_defs = json.load(f)
     rules = pd.read_csv(RULES_PATH)
+    # antecedents are stored as "flagA|flagB"; split once so lookups are cheap later
     rules["items"] = rules["antecedent_items"].str.split("|")
     return item_defs, rules
 
@@ -41,9 +44,11 @@ def flag_items(df, item_defs):
     d["loan_to_income"] = d["loan_amount_requested"] / d["avg_monthly_income"]
     d["repayment_ratio"] = np.where(d["previous_micro_loans"] > 0,
                                     d["previous_loans_repaid_on_time"] / d["previous_micro_loans"].clip(lower=1), np.nan)
+    # derived ratios the item definitions refer to (same formulas as the ARM notebook)
     out = pd.DataFrame(index=d.index)
     for it in item_defs["items"]:
         values = d[it["column"]]
+        # string thresholds are categorical equality tests, numeric ones use the stored operator
         if isinstance(it["threshold"], str):
             out[it["item"]] = values == it["threshold"]
         else:
@@ -52,6 +57,7 @@ def flag_items(df, item_defs):
 
 
 def rules_hit_count(flags, rules):
+    """Number of mined rules fully satisfied by each applicant (row-wise count)."""
     return sum(flags[items].all(axis=1).astype(int) for items in rules["items"])
 
 

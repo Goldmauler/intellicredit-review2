@@ -1,3 +1,6 @@
+"""Builds notebooks/03_M3_feature_engineering.ipynb (Review 1 - Member 3: feature engineering and train/test splits).
+
+Run from the repository root; the notebook is written by nbformat and is not executed here."""
 import nbformat as nbf
 import os
 

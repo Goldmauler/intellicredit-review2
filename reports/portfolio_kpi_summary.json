@@ -1,0 +1,36 @@
+{
+  "report_generated_at": "2026-11-10 12:41:59",
+  "data_audit": {
+    "overall_status": "PASSED",
+    "checks_count": 8
+  },
+  "delinquency_dynamics": {
+    "roll_current_to_30_pct": 1.87,
+    "roll_30_to_60_pct": 57.410000000000004,
+    "roll_60_to_default_pct": 75.49,
+    "cure_30_to_current_pct": 38.0,
+    "cure_60_to_current_pct": 21.67
+  },
+  "ecl_provisioning": {
+    "total_ead_inr": 577458900.5,
+    "base_ecl_inr": 96327835.3,
+    "base_coverage_pct": 16.681331817137693,
+    "stage_1_ecl_inr": 15703165.29,
+    "stage_2_ecl_inr": 4016395.54,
+    "stage_3_ecl_inr": 76608274.47,
+    "probability_weighted_ecl_inr": 103552422.94749999,
+    "probability_weighted_coverage_pct": 17.932431703423017
+  },
+  "vintage_performance": {
+    "cohorts_tracked": 26,
+    "avg_epd_mob3_pct": 0.7550000000000001,
+    "avg_epd_mob6_pct": 3.544230769230769,
+    "avg_mob12_default_pct": 5.951538461538463
+  },
+  "stress_testing": {
+    "baseline_loss_inr": 181480368.83915,
+    "moderate_adverse_loss_inr": 364995439.58497727,
+    "severe_adverse_loss_inr": 642736307.2606411,
+    "severe_stressed_crar_pct": 1.494597987923289
+  }
+}

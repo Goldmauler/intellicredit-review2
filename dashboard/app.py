@@ -134,6 +134,7 @@ div[role="radiogroup"] > label:has(input:checked) { border-color: #1f1f1f; backg
 st.markdown(CSS, unsafe_allow_html=True)
 
 PALETTE = ["#1f3a5f", "#b8862f", "#9b2c2c", "#3d6b4f", "#6b5b7b", "#5a5546"]
+# Consistent colours across charts: scenarios and risk bands
 SCEN_COLORS = {"Baseline": "#1f3a5f", "Adverse": "#b8862f", "Severe": "#9b2c2c"}
 BAND_COLORS = {"A": "#5b8a6b", "B": "#9bb37c", "C": "#d8c46a", "D": "#d89b5a", "E": "#b34a4a"}
 # Risk-band-based product rate schedule (used to auto-assign interest rate)
@@ -148,6 +149,7 @@ SCEN_HELP = {
     "Severe": "A COVID-style shock with lockdown months. Defaults rise sharply.",
 }
 
+# Three demo applicants (approve / conditional / decline) used to auto-fill the form during a live demo
 PRESETS = {
     "Customer 1 (Auto-Approve: Prime Gig Worker)": {
         "age": 34, "gig_tenure_months": 36, "has_bank_account": 1, "num_dependents": 1,
@@ -257,13 +259,17 @@ def decide(pit, be, band, n_rules):
 # ---------------------------------------------------------------------------------------------- data
 @st.cache_resource
 def load_model():
+    """Load the trained LightGBM model once per server process (st.cache_resource)."""
     return joblib.load(MODEL_PATH)
 
 
 @st.cache_data
 def load_artifacts(_model):
+    """Load every data/model artifact the tabs need and pre-score the held-out test borrowers.
+    The leading underscore tells Streamlit not to hash the model argument."""
     borrowers = pd.read_csv(os.path.join(DATA_DIR, "borrower_profiles.csv"))
     from sklearn.model_selection import train_test_split
+    # rebuild the exact 80/20 split used in training so the explorer only shows unseen borrowers
     _, test_idx = train_test_split(borrowers.index, test_size=TEST_SIZE,
                                    stratify=borrowers["loan_default_status"], random_state=RANDOM_STATE)
     test_borrowers = borrowers.loc[test_idx].copy()
@@ -299,6 +305,7 @@ def load_artifacts(_model):
 
 model = load_model()
 borrowers, test_borrowers, card, overlay, item_defs, rules, scen, impact, ts_cmp, pm, macro, sources = load_artifacts(model)
+# macro scenario -> PD multiplier (neutral = 1.0, others come from the SARIMAX overlay)
 multipliers = {"Neutral (through-the-cycle)": 1.0, **overlay["multipliers_next_12m"]}
 
 # ============================================================================================== sidebar
