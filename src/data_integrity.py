@@ -55,7 +55,21 @@ class AuditCheckResult:
 
 def audit_loan_book(book_df: pd.DataFrame) -> List[AuditCheckResult]:
     """Audits schema, primary key uniqueness, and financial ranges in the loan book."""
-    results = []
+    required_columns = {"borrower_id", "loan_tenure_months"}
+    missing_columns = sorted(required_columns - set(book_df.columns))
+    if not {"loan_amount", "loan_amount_requested"} & set(book_df.columns):
+        missing_columns.append("loan_amount or loan_amount_requested")
+
+    schema_result = AuditCheckResult(
+        "loan_book_required_columns",
+        not missing_columns,
+        "Required columns are present."
+        if not missing_columns
+        else f"Missing required columns: {', '.join(missing_columns)}",
+    )
+    results = [schema_result]
+    if missing_columns:
+        return results
 
     # 1. Primary key uniqueness
     has_dup = book_df["borrower_id"].duplicated().any()
@@ -116,7 +130,18 @@ def audit_loan_book(book_df: pd.DataFrame) -> List[AuditCheckResult]:
 
 def audit_performance_panel(perf_df: pd.DataFrame) -> List[AuditCheckResult]:
     """Audits the monthly loan performance panel for temporal and state consistency."""
-    results = []
+    required_columns = {"dpd", "outstanding_principal", "status"}
+    missing_columns = sorted(required_columns - set(perf_df.columns))
+    schema_result = AuditCheckResult(
+        "panel_required_columns",
+        not missing_columns,
+        "Required columns are present."
+        if not missing_columns
+        else f"Missing required columns: {', '.join(missing_columns)}",
+    )
+    results = [schema_result]
+    if missing_columns:
+        return results
 
     # 1. DPD bounds (DPD cannot be negative)
     neg_dpd = (perf_df["dpd"] < 0).any()
