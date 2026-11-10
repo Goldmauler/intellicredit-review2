@@ -18,6 +18,8 @@ import plotly.graph_objects as go
 import streamlit as st
 from plotly.subplots import make_subplots
 
+import datamaking_section
+
 NAVY, OCHRE, BRICK, SLATE, GREEN = "#1f3a5f", "#b8862f", "#9b2c2c", "#5a5546", "#3d6b4f"
 MODEL_STYLE = {                       # fixed order, never re-coloured; marker shape is the second encoding
     "Logistic scorecard": (SLATE, "square"),
@@ -150,6 +152,8 @@ def _pct(x, nd=1):
 
 # ---------------------------------------------------------------------------------------------------------------- render
 def render(root, explain, style_fig, html_table, pm, real_res, srcs, npl):
+    global _ROOT
+    _ROOT = root
     st.markdown(CSS, unsafe_allow_html=True)
     st.markdown("## Proof and comparison")
     explain("Examiners usually ask three things: <b>is the research real</b>, <b>is the made-up data close enough to real data</b>, and "
@@ -161,12 +165,16 @@ def render(root, explain, style_fig, html_table, pm, real_res, srcs, npl):
                    "`python scripts/build_fidelity_anchors.py` from the repository root.")
         return
 
-    sections = ["Summary", "Real-data benchmark", "Is the made-up data realistic?", "Versus published studies",
+    sections = ["Summary", "How the data is made, step by step", "Real-data benchmark", "Is the made-up data realistic?", "Versus published studies",
                 "Versus existing products", "Head-to-head", "Sources and re-run"]
     sec = st.radio("Section", sections, horizontal=True, label_visibility="collapsed", key="proof_section")
-    {"Summary": _summary, "Real-data benchmark": _benchmark, "Is the made-up data realistic?": _realism,
+    {"Summary": _summary, "How the data is made, step by step": _how_made, "Real-data benchmark": _benchmark, "Is the made-up data realistic?": _realism,
      "Versus published studies": _literature, "Versus existing products": _products, "Head-to-head": _headtohead,
      "Sources and re-run": _sources}[sec](D, explain, style_fig, _table, pm, real_res, srcs, npl)
+
+
+def _how_made(D, explain, style_fig, html_table, pm, real_res, srcs, npl):
+    datamaking_section.render(_ROOT, explain, style_fig, html_table, _tag)
 
 
 # ---------------------------------------------------------------------------------------------------------------- 1 summary
