@@ -46,6 +46,7 @@ $papers = @(
   @{ f='2016_JPMorganChaseInstitute_Farrell_Greig_platform_economy_income_volatility.pdf'; u='https://www.jpmorganchase.com/content/dam/jpmc/jpmorgan-chase-and-co/institute/pdf/jpmc-institute-volatility-2-report.pdf' }  # [73]
   @{ f='2018_NYFed_LibertyStreet_borrowing_repayment_bankruptcy_by_age.html'; u='https://libertystreeteconomics.newyorkfed.org/2018/11/just-released-a-look-at-borrowing-repayment-and-bankruptcy-rates-by-age.html' }  # [74]
   @{ f='2023_NCAER_PRI_workshop_food_delivery_platform_workers.pdf'; u='https://www.mof.go.jp/pri/research/conference/indiaws/indiaws2023_02_02.pdf' }  # [75]
+  @{ f='2022_CFPB_BNPL_market_trends_and_consumer_impacts_presentation.pdf'; u='https://files.consumerfinance.gov/f/documents/cfpb_buy-now-pay-later-market-trends-and-consumer-impacts_presentation_2022-11.pdf' }  # [76]
 )
 
 $ok = 0; $fail = @()

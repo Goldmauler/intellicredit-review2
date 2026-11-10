@@ -10,6 +10,12 @@
 
 1.4 billion adults worldwide are unbanked (World Bank Global Findex 2021), and India's 7.7–12 million gig and platform workers (NITI Aayog 2022; Economic Survey 2025-26) mostly have thin or no credit files (CIBIL/FICO). Lenders either exclude them unfairly or lend blind and suffer high defaults. Traditional scoring ignores alternative behavioural signals, is hard to explain, and ignores macroeconomic shocks.
 
+**Why this matters now** (checked 10 Nov 2026):
+- **29 Jan 2026, Economic Survey 2025-26:** about 12 million gig workers in FY25, up 55% from 7.7 million in FY21 and over 2% of the workforce; about 40% of them earn under ₹15,000 a month ([Business Today](https://www.businesstoday.in/amp/union-budget/story/india-has-12-million-gig-workers-2-of-total-workforce-economic-survey-513429-2026-01-29)).
+- **28 Feb 2026, MFIN (microfinance lenders' body):** its CEO said the sector is "past the peak" of its recent stress, with loans 1-180 days overdue at 4.7% in January and liquidity still tight ([Business Today](https://www.businesstoday.in/latest/economy/story/indias-microfinance-sector-past-stress-peak-portfolio-quality-improves-mfin-518542-2026-02-28)). Low-income delinquency can swing within a year, which is what the scenario forecasts in Method 1 are for.
+- **30 Oct 2026, Ministry of Labour:** notified the National Social Security Board for unorganised, gig and platform workers ([Siasat](https://www.siasat.com/govt-notifies-national-social-security-board-for-gig-platform-workers-3566984/)).
+- **3 Nov 2026, UPI:** a record 25.47 billion transactions worth ₹31.53 lakh crore in October ([Entrepreneur India](https://india.entrepreneur.com/business-news/upi-hits-record-25-47-bn-transactions-in-october-daily-value-crosses-inr-1-l-cr)). UPI activity is the digital footprint the alternative-data features are built on.
+
 **IntelliCredit** answers four questions:
 
 | Question | Method | Where |
@@ -74,6 +80,63 @@ No pre-built Kaggle / UCI / GitHub dataset is used.
 
 Neither API needs a key. Each raw response is cached in `data/external/raw/`, and provenance is recorded per column in `data/external/macro_sources.json`: endpoint, series ID, whether it came live, and the last observation. **Fallback order:** live API → cached raw file → synthetic series, so the pipeline never breaks offline. COVID lockdown and second-wave months are added as event dummies taken from the public record.
 
+## How `borrower_profiles.csv` is generated, and why
+
+> **Read this first.** The borrower data is synthetic: `data_generation.py` draws every variable from a stated distribution and then draws the default label from a stated formula (seed 42). The *shapes* are our assumptions. Where a verified real figure exists we compare against it and say whether it matches. The data proves the pipeline works end to end against a known ceiling (best possible AUC 0.781). It does **not** prove that real borrowers behave this way. Local copies of the sources are in [`research/papers/`](research/papers/), numbered as in [`research/REFERENCES_ACM.md`](research/REFERENCES_ACM.md).
+
+### Step 1: who the borrowers are
+| Variable | How it is generated | Why | Real-world check | Verdict |
+|---|---|---|---|---|
+| Age | Normal(mean 32, sd 8), clipped to 21-60 (actual mean 31.8) | Gig work skews young | NCAER survey of 924 delivery workers [75]: mean age 29.1, 84% under 35. Ours: 65% under 35 | Older than the one verified survey |
+| Gender | Male 58%, Female 40%, Other 2% | Assumption for a mixed gig population; **not a model input** | No verified anchor | Assumption |
+| Location | Metro 30%, Tier-1 25%, Tier-2 20%, Semi-urban 15%, Rural 10%; income multipliers 1.4, 1.2, 1.0, 0.8, 0.6 | Platform work is urban-heavy and city pay is higher | No verified anchor | Assumption |
+| Education | Below 10th 5%, 10th 10%, 12th 25%, Diploma 20%, Undergraduate 30%, Postgraduate 10% | Platform workers are better educated than average workers | NCAER [75]: 6% below Class X, 56% Class X to below graduate, 38% graduate. Ours: 5.1%, 55.2%, 39.7% | **Matches** |
+| Platform | Uniform over 8 kinds | Deliberately gives the model no platform effect | none | By design |
+| Gig tenure | Exponential, mean 18 months, clipped 1-120 | Many gig workers are new and churn fast | NCAER [75], active workers: under 1 year 48.7%, 1-2 years 25.7%, over 2 years 25.7%. Ours: 48.4%, 26.6%, 25.0% | **Matches** |
+| Bank account | 85% yes | Assumption | none | Assumption |
+| Dependents | 0 to 5, mean about 2 | Assumption | none | Assumption (the data shows no effect) |
+| Monthly income | Uniform ₹8,000-55,000 × location × education multipliers (0.7-1.25), then monthly noise of base × max(0.05, 0.35 − 0.003 × tenure) | Spans low to middle earners; newer workers have shakier income | Economic Survey: about 40% under ₹15,000, ours 15.2%. NCAER long-shift workers: ₹20,744 a month, our median ₹31,532 | **Too optimistic** |
+
+Transactions (`monthly_transactions.csv`, 12 months each) follow the same logic: bills are paid on time with probability 0.6 + 0.005 × tenure + 0.3 × (income ÷ base − 1), clipped 0.3-0.98 (steadier and longer-serving workers pay more reliably); recharge gap Normal(28, 8) days (28-30-day prepaid plans); **buy-now-pay-later use rises as age falls** (probability 0.3 + 0.02 × (35 − age) − 0.002 × tenure; the CFPB [76] reports that BNPL borrowers skew young); expenses Normal(0.70, 0.15) of income; app logins Poisson(15 + 0.2 × tenure); UPI payments Poisson(12 × location multiplier). Directions have real-world support or are plausible; sizes are judgement.
+
+### Step 2: who defaults (the label)
+Each borrower's default is a coin flip whose probability is `1 / (1 + e^−z)`, where `z` is the sum below. The intercept (−1.2) was set so the overall rate lands near 8% (actual 7.87%). The Normal(0, 0.5) noise stands for everything we do not observe, and it is what caps the best possible AUC at 0.781.
+
+| Term in `z` | Weight | Why this direction | Real-data check (our test on public datasets) | Share of risk spread |
+|---|---:|---|---|---:|
+| Utility on-time share | −2.5 | Paying small bills on time shows reliability | HELOC ρ −0.28, Taiwan −0.14: **same direction** | 16.0% |
+| Loan amount (per rupee) | +0.000005 | A bigger loan is harder to repay | German credit +0.09 (amount), +0.21 (duration): same direction, **but charged per rupee, not per income** | 16.0% |
+| Gig tenure (per month) | −0.02 | A longer record means a steadier worker | HELOC months on file −0.26 and −0.22: **same direction** | 14.7% |
+| Income falling (slope under −500) | +0.8 | A falling income is a warning | No public dataset records it | 13.9% |
+| Income volatility | +3.0 | Bumpy income makes instalments hard | No public dataset records it | 10.2% |
+| BNPL debt ÷ income | +2.0 | Existing debt crowds out repayment | All 5 real checks positive (+0.02 to +0.35); weak in the synthetic data | 9.3% |
+| Savings buffer | −1.5 | Savings absorb a bad month | Taiwan repayment proxy −0.14: same direction | 9.3% |
+| Past repayment ratio | −0.5 | Past behaviour predicts future behaviour | Not tested | 5.5% |
+| App logins | −0.03 | Engagement is a digital-footprint signal (Berg et al. 2020 [1]) | Not tested | 4.7% |
+| Recharge gap over 35 days | +0.5 | Irregular top-ups hint at cash strain | Not tested | 0.5% |
+
+"Share of risk spread" is each term's standard deviation as a share of the total, computed from the file. Details: `models/validation/effect_concordance.csv`, dashboard tab *Proof & comparison*.
+
+### Do young and low-income borrowers really default more? What we can and cannot claim
+| | Real-world evidence | What our synthetic data does |
+|---|---|---|
+| **Young borrowers** | New York Fed [74]: card delinquency (90+ days) is generally highest among the youngest borrowers. JPMorgan Chase Institute [73]: 70% of 18-24 year-olds saw a month-to-month income change above 30%, against 55% nationally. On public credit data (our test): age ρ −0.117 (Give Me Some Credit), −0.112 (German credit), +0.005 (Taiwan cards), so younger borrowers default somewhat more in 2 of 3 | **No direct age term.** Age acts only through BNPL use. Default is 8.6% for ages 21-25 and 7.3% for 41-60: the direction is right, the effect is small |
+| **Low-income borrowers** | JPMorgan [73]: 74% of the bottom income quintile saw income swings above 30%. PLFS 2021-22 as quoted by NCAER [75]: urban male workers aged 18-29 earn about ₹13,000 a month against ₹18,600 for all aged 18+. On public credit data: income ρ −0.067 (Give Me Some Credit), credit limit ρ −0.170 (Taiwan): higher income, fewer defaults | **Opposite direction.** Loans are sized at 1.5-6 months of income and charged per rupee, so default rises with income: 4.8%, 6.8%, 8.8% and 11.2% from the lowest to the highest income quartile. This is a known, documented gap (see Limitations) |
+
+What is safe to say: income instability and short track record are the risk drivers in this data; *young* and *low income* are real-world correlates of them, supported by the sources above, and the real effects are modest (|ρ| about 0.1). What not to say: that the synthetic data shows low-income people defaulting more.
+
+### Step 3: why these models
+| Choice | Why | Evidence |
+|---|---|---|
+| Logistic regression | A transparent scorecard baseline, the industry standard | Lessmann et al. 2015 [8] (41 classifiers on 8 real datasets): several methods beat it significantly, which is why it is only the baseline |
+| Random forest | The minimum benchmark a credit model should be compared with | Lessmann et al. 2015 [8] |
+| XGBoost | Boosted trees lead on tabular credit data; deep networks were no better and cost more | Gunnarsson et al. 2021 [9]; ours is the best single tuned Review 1 model (AUC 0.738) |
+| LightGBM | Same family, fast, supports exact TreeSHAP and could be calibrated, so it became the final model | Ours: 0.735 tuned, 0.741 calibrated (Brier 0.068) |
+| Gradient boosting (scikit-learn) | The classic boosting baseline | Fills out the family |
+| Voting and stacking | Ensembles generally beat single models | Dastile et al. 2020 [10] (74 studies); here no gain: stacking flags no defaulters at the 0.5 cut-off |
+
+The four tuned models are within about 0.03 AUC of each other, so the final choice was driven by calibration and explainability, not by a headline score. Why synthetic data at all: borrower files are legally closed (CICRA 2005, DPDP Act 2023) and major banks and regulators use synthetic data for this reason (Assefa et al. 2020 [13], FCA 2024 [14]).
+
 ---
 
 ## Real-Data Validation Track
@@ -108,7 +171,7 @@ jupyter nbconvert --to notebook --execute --inplace notebooks/09_R3_real_data_va
 1. **Conformal prediction for credit forecasts** — distribution-free intervals; Adaptive Conformal Inference (Gibbs & Candès 2021) keeps coverage through COVID where model intervals fail (notebook 09 Part B).
 2. **Regime-aware NPL forecasting for India** — RBI's Asset Quality Review, IBC clean-up and COVID standstill enter as regime ramps; they explain India's real NPL path better than macro drivers alone.
 3. **Counterfactual "path to approval"** in the dashboard — the cheapest *actionable* changes that turn a decline into an approval (`src/recourse.py`; Wachter 2017, Ustun 2019, DiCE 2020). The interest rate and immutable attributes are never used.
-4. **Synthetic-vs-real fidelity scorecard** — every mechanism the synthetic data relies on is tested on real data, and failures are reported (notebook 09 Part F, dashboard tab *Real-Data Reality Check*).
+4. **Synthetic-vs-real fidelity scorecard** — every mechanism the synthetic data relies on is tested on real data, and failures are reported (notebook 09 Part F, dashboard tab *Proof & comparison*).
 5. **Fairness audit on real lending decisions** — adjusted denial odds by race and sex after the risk flags (HMDA).
 
 Research evidence (72 verified sources, 29 open-access PDFs, benchmark tables, reviewer answers): [`research/`](research/).
