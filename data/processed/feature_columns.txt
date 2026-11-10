@@ -1,0 +1,17 @@
+gig_tenure_months
+utility_on_time_count
+income_volatility_index
+std_monthly_income
+payment_consistency_streak
+income_trend_slope
+avg_utility_delay_days
+digital_engagement_score
+loan_amount_requested
+max_utility_delay_days
+income_momentum
+savings_buffer_ratio
+balance_volatility
+avg_monthly_income
+max_bnpl_monthly_amount
+financial_stress_index
+debt_to_inflow_ratio

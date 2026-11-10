@@ -40,7 +40,7 @@ Faker.seed(42)
 # ============================================================================
 NUM_BORROWERS = 30000
 NUM_MONTHS = 12
-OUTPUT_DIR = "data"
+OUTPUT_DIR = os.environ.get("INTELLICREDIT_DATA_DIR", os.path.join(os.path.dirname(os.path.abspath(__file__)), "data"))
 
 GIG_PLATFORMS = [
     "Ride-Hailing (Uber/Ola)",
@@ -146,7 +146,7 @@ def main():
     upi_txns = np.clip(np.random.poisson((12 * loc_mult)[:, None] * np.ones((1, m))), 0, 80)
 
     # Build month labels
-    month_dates = [(datetime(2025, 1, 1) + timedelta(days=30 * mi)).strftime("%Y-%m") for mi in range(m)]
+    month_dates = pd.date_range(start="2025-01-01", periods=m, freq="MS").strftime("%Y-%m").tolist()
 
     # Flatten into transaction DataFrame
     rep_ids = np.repeat(borrower_ids, m)

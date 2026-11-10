@@ -1,4 +1,21 @@
+# Byte-compiled / cache / checkpoints
+__pycache__/
+*.py[cod]
+*$py.class
 .ipynb_checkpoints/
+.scripts/
+# Academic Rubric Docs & Temporary Notes
 Capstone_Project_Rubrics_Updated.docx
 project_idea_chosen.txt
 
+# Heavy Trained Model Binaries (Total > 200MB - exceed recommended Git limits)
+models/*.joblib
+models/*.pkl
+!models/model_comparison.csv
+# small calibrated model served by the dashboard (~0.7 MB)
+!models/underwriting_model.joblib
+
+# OS specific files
+.DS_Store
+Thumbs.db
+desktop.ini
