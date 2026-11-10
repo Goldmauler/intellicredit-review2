@@ -32,7 +32,9 @@ from src.config import BORROWER_PROFILES_PATH, MODELS_DIR, ORDINAL_MAPS, RANDOM_
 MODEL_PATH = os.path.join(MODELS_DIR, "underwriting_model.joblib")
 CARD_PATH = os.path.join(MODELS_DIR, "underwriting_model_card.json")
 
+# Loss given default: share of exposure not recovered after a default
 LGD = 0.65
+# Annual funding cost the lender pays; interest above this is margin
 COST_OF_FUNDS = 0.09
 
 # Raw application inputs (what the dashboard form asks for)
@@ -62,6 +64,7 @@ FEATURE_LABELS = {
 
 def build_features(raw: pd.DataFrame) -> pd.DataFrame:
     """Raw application fields -> model features (pure function, used by training and the dashboard)."""
+    # ordinal encodings and ratios mirror the Review 1 feature engineering
     f = pd.DataFrame(index=raw.index)
     f["age"] = raw["age"]
     f["gig_tenure_months"] = raw["gig_tenure_months"]
@@ -69,7 +72,7 @@ def build_features(raw: pd.DataFrame) -> pd.DataFrame:
     f["num_dependents"] = raw["num_dependents"]
     f["location_code"] = raw["location_type"].map(ORDINAL_MAPS["location_type"])
     f["education_code"] = raw["education_level"].map(ORDINAL_MAPS["education_level"])
-    income = raw["avg_monthly_income"].clip(lower=1)
+    income = raw["avg_monthly_income"].clip(lower=1)  # floor at 1 to avoid divide-by-zero below
     f["avg_monthly_income"] = raw["avg_monthly_income"]
     f["income_volatility_index"] = raw["std_monthly_income"] / income
     f["income_trend_slope"] = raw["income_trend_slope"]
@@ -91,11 +94,13 @@ def build_features(raw: pd.DataFrame) -> pd.DataFrame:
 
 
 def break_even_pd(rate_annual_pct, tenure_months):
+    """PD at which expected interest income equals expected credit loss (decline above this)."""
     margin = np.maximum(np.asarray(rate_annual_pct) / 100 - COST_OF_FUNDS, 0.001) * np.asarray(tenure_months) / 12
     return margin / (margin + LGD)
 
 
 def risk_band(pd_value):
+    """Map a probability of default to a letter band A (safest) to E (riskiest)."""
     for upper, band in [(0.04, "A"), (0.07, "B"), (0.11, "C"), (0.16, "D")]:
         if pd_value < upper:
             return band
@@ -103,6 +108,7 @@ def risk_band(pd_value):
 
 
 def train():
+    """Train the LightGBM PD model, write the joblib + model card, return (model, card)."""
     df = pd.read_csv(BORROWER_PROFILES_PATH)
     X = build_features(df)
     y = df["loan_default_status"]
@@ -121,6 +127,7 @@ def train():
     deciles = pd.qcut(p_test, 10, labels=False, duplicates="drop")
     calib = pd.DataFrame({"pred": p_test, "obs": y_test.values, "decile": deciles}).groupby("decile")[["pred", "obs"]].mean()
 
+    # simulate the decision policy on the held-out set: approve when PD is below break-even
     be = break_even_pd(df.loc[test_idx, "interest_rate_annual"], df.loc[test_idx, "loan_tenure_months"])
     approve = p_test < be
     card = {
