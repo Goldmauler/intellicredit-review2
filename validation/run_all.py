@@ -33,12 +33,14 @@ DIVIDER = "=" * 65
 
 
 def section(title):
+    """Print a banner so each pipeline stage is easy to spot in the console output."""
     print(f"\n{DIVIDER}")
     print(f"  {title}")
     print(DIVIDER)
 
 
 def main():
+    """Run validation steps 1-4 in order and print a timed run summary."""
     start_all = time.time()
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     print(f"\n{DIVIDER}")

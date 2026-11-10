@@ -1,3 +1,6 @@
+"""Builds notebooks/01_M1_data_cleaning_preprocessing.ipynb (Review 1 - Member 1: cleaning, preprocessing, dataset documentation).
+
+Run from the repository root; the notebook is written by nbformat and is not executed here."""
 import nbformat as nbf
 import os
 

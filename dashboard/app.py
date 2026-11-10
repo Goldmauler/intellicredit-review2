@@ -38,11 +38,13 @@ from src.underwriting_model import (  # noqa: E402
 
 st.set_page_config(page_title="IntelliCredit Underwriter", page_icon=":credit_card:", layout="wide")
 
+# Consistent colours across charts: scenarios (blue/orange/red) and risk bands (green -> red)
 SCEN_COLORS = {"Baseline": "#4c72b0", "Adverse": "#dd8452", "Severe": "#c44e52"}
 BAND_COLORS = {"A": "#1a9850", "B": "#91cf60", "C": "#fee08b", "D": "#fc8d59", "E": "#d73027"}
 # Risk-band-based product rate schedule (used to auto-assign interest rate)
 BAND_RATES = {"A": 14.0, "B": 18.0, "C": 22.0, "D": 26.0, "E": 30.0}
 
+# Three demo applicants (approve / conditional / decline) used to auto-fill the form during a live demo
 PRESETS = {
     "Customer 1 (Auto-Approve: Prime Gig Worker)": {
         "age": 34, "gig_tenure_months": 36, "has_bank_account": 1, "num_dependents": 1,
@@ -77,12 +79,16 @@ PRESETS = {
 # ---------------------------------------------------------------------------------------------- data
 @st.cache_resource
 def load_model():
+    """Load the trained LightGBM model once per server process (st.cache_resource)."""
     return joblib.load(MODEL_PATH)
 
 
 @st.cache_data
 def load_artifacts(_model):
+    """Load every data/model artifact the tabs need and pre-score the held-out test borrowers.
+    The leading underscore tells Streamlit not to hash the model argument."""
     borrowers = pd.read_csv(os.path.join(DATA_DIR, "borrower_profiles.csv"))
+    # rebuild the exact 80/20 split used in training so the explorer only shows unseen borrowers
     from sklearn.model_selection import train_test_split
     _, test_idx = train_test_split(borrowers.index, test_size=TEST_SIZE,
                                    stratify=borrowers["loan_default_status"], random_state=RANDOM_STATE)
@@ -108,6 +114,7 @@ def load_artifacts(_model):
     test_borrowers["break_even_pd"] = np.round(break_even_pd(test_borrowers["interest_rate_annual"], test_borrowers["loan_tenure_months"]), 4)
     flags_test = flag_items(test_borrowers, item_defs)
     test_borrowers["rules_hit"] = rules_hit_count(flags_test, rules)
+    # decision policy: decline if PD >= break-even or band E; refer to review if 3+ warning rules fire
     test_borrowers["policy_decision"] = np.where(
         (test_borrowers["predicted_pd"] >= test_borrowers["break_even_pd"]) | (test_borrowers["risk_band"] == "E"), "DECLINE",
         np.where(test_borrowers["rules_hit"] >= 3, "CONDITIONAL / REVIEW", "APPROVE")
@@ -118,6 +125,7 @@ def load_artifacts(_model):
 
 model = load_model()
 borrowers, test_borrowers, card, overlay, item_defs, rules, scen, impact, ts_cmp, pm, macro, sources = load_artifacts(model)
+# macro scenario -> PD multiplier (neutral = 1.0, others come from the SARIMAX overlay)
 multipliers = {"Neutral (through-the-cycle)": 1.0, **overlay["multipliers_next_12m"]}
 
 # ---- FIX 2: Sidebar now contains ONLY macro scenario controls (duplicate customer picker removed) ----
@@ -143,6 +151,7 @@ tab_uw, tab_data, tab_port, tab_rules, tab_model = st.tabs([
 # FIX 2: Single customer selector (no sidebar duplicate)
 # FIX 3: Interest rate auto-assigned, moved to Advanced section
 with tab_uw:
+    # preset selector first; the radio choice decides which values pre-fill the form below
     st.header("Credit Decision Engine")
     st.markdown("##### ⚡ Quick Select Customer Profile")
 
@@ -390,6 +399,7 @@ with tab_port:
     k3.metric("Neutral Economy Rate", f"{overlay['neutral_default_rate_pct']:.2f}%")
     k4.metric("Forecast Model", "SARIMAX + Macro Drivers", help=overlay["model"])
 
+    # historical default rate + forecast fan (80% interval) per selected macro scenario
     show_scen = st.multiselect("Macro Scenarios", list(SCEN_COLORS), default=list(SCEN_COLORS))
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=pm["date"], y=pm["default_rate"] * 100, name="Historical Actual", line=dict(color="black", width=2.5)))
@@ -405,6 +415,7 @@ with tab_port:
                       xaxis=dict(rangeslider=dict(visible=True)))
     st.plotly_chart(fig, width="stretch")
 
+    # ECL table and hold-out accuracy side by side
     _ecl_year = datetime.now().year
     c1, c2 = st.columns(2)
     with c1:
