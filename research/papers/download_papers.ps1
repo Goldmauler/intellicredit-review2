@@ -43,6 +43,9 @@ $papers = @(
   @{ f='2015_CFPB_complaint_narratives_policy.pdf';           u='https://files.consumerfinance.gov/f/201506_cfpb_publication-of-consumer-response-complaint-narratives.pdf' } # [58]
   @{ f='2022_NITI_Aayog_gig_economy_policy_brief.pdf';        u="https://www.niti.gov.in/sites/default/files/2022-06/Policy_Brief_India's_Booming_Gig_and_Platform_Economy_27062022.pdf" } # [64]
   @{ f='2026_MFIN_Micrometer_Q1FY27_press_release.pdf';       u='https://mfinindia.org/assets/upload_image/news/pdf/Micrometer%20Q1%20FY%2026-27%20Press%20Release.pdf' } # [67]
+  @{ f='2016_JPMorganChaseInstitute_Farrell_Greig_platform_economy_income_volatility.pdf'; u='https://www.jpmorganchase.com/content/dam/jpmc/jpmorgan-chase-and-co/institute/pdf/jpmc-institute-volatility-2-report.pdf' }  # [73]
+  @{ f='2018_NYFed_LibertyStreet_borrowing_repayment_bankruptcy_by_age.html'; u='https://libertystreeteconomics.newyorkfed.org/2018/11/just-released-a-look-at-borrowing-repayment-and-bankruptcy-rates-by-age.html' }  # [74]
+  @{ f='2023_NCAER_PRI_workshop_food_delivery_platform_workers.pdf'; u='https://www.mof.go.jp/pri/research/conference/indiaws/indiaws2023_02_02.pdf' }  # [75]
 )
 
 $ok = 0; $fail = @()
