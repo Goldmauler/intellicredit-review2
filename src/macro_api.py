@@ -56,10 +56,12 @@ WORLD_BANK_INDICATORS = {
 COVID_LOCKDOWN_MONTHS = ["2020-03", "2020-04", "2020-05", "2020-06"]
 COVID_SECOND_WAVE_MONTHS = ["2021-04", "2021-05", "2021-06"]
 
+# Identify ourselves politely to the public APIs
 HEADERS = {"User-Agent": "IntelliCredit-capstone/1.0 (academic project)"}
 
 
 def _get(url, params=None, retries=3, timeout=30):
+    """GET with linear back-off (1.5s, 3s, 4.5s); re-raises the last error if every attempt fails."""
     last_err = None
     for attempt in range(retries):
         try:
@@ -75,10 +77,11 @@ def _get(url, params=None, retries=3, timeout=30):
 def fetch_fred(series_id, offline=False):
     """Return a monthly pd.Series indexed by month start. Raw CSV is cached to RAW_DIR."""
     cache = os.path.join(RAW_DIR, f"fred_{series_id}.csv")
-    origin = "cache"
+    origin = "cache"  # flipped to "live" only after a successful download is written
     if not offline:
         try:
             resp = _get("https://fred.stlouisfed.org/graph/fredgraph.csv", params={"id": series_id})
+            # FRED serves an HTML error page with HTTP 200 for bad ids, so sniff the header row
             if not resp.text.lstrip().lower().startswith("observation_date"):
                 raise ValueError(f"FRED returned non-CSV content for {series_id}")
             with open(cache, "w", encoding="utf-8") as f:
@@ -92,6 +95,7 @@ def fetch_fred(series_id, offline=False):
     df.columns = ["date", "value"]
     df["date"] = pd.to_datetime(df["date"])
     df["value"] = pd.to_numeric(df["value"], errors="coerce")
+    # resample to month-start so every source shares one index
     s = df.dropna().set_index("date")["value"]
     return s.resample("MS").mean(), origin
 
@@ -148,17 +152,20 @@ def synthetic_macro(months, seed=42):
 
 
 def build_macro_table(offline=False):
+    """Assemble the monthly macro table, record provenance per column, write CSV + JSON.
+    Returns (table, sources)."""
     os.makedirs(RAW_DIR, exist_ok=True)
     months = pd.date_range(START, END, freq="MS")
     table = pd.DataFrame(index=months)
     sources = {"generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"), "columns": {}}
-    synthetic = synthetic_macro(months)
+    synthetic = synthetic_macro(months)  # computed once; used only for columns whose API+cache both fail
 
     print("[1/2] FRED monthly series")
     for col, (series_id, desc) in FRED_SERIES.items():
         try:
             s, origin = fetch_fred(series_id, offline)
             last_obs = s.index.max()
+            # forward-fill gaps and flag months beyond the last real observation
             table[col] = s.reindex(months).ffill()
             table[f"{col}_is_carried_forward"] = (months > last_obs).astype(int)
             sources["columns"][col] = {
