@@ -1,0 +1,42 @@
+IntelliCredit Validation Run  |  2026-11-09 15:44:32
+
+-- Transfer Experiments ------------------------------------------
+Experiment                 AUC   PR-AUC      KS    Brier      ECE
+-----------------------------------------------------------------
+S->S                    0.7406   0.1989  0.3571  0.06808  0.00486
+U->U                      0.77    0.533  0.4041  0.14004  0.01446
+S->U (TSTR)             0.5169   0.2344   0.057  0.19161   0.1358
+U->S (TRTS)             0.5607   0.0969  0.0974  0.07315  0.01418
+S->U ablated            0.5255   0.2574  0.0642  0.18724  0.11493
+
+AUC Gap (S->S vs TSTR): 0.2237  ->  Strong domain mismatch (>0.15)
+
+-- Policy Outcomes (break-even rule) --------------------------------
+Experiment               Approval   DR(Approved)   DR(Declined)
+-----------------------------------------------------------------
+S->S                       0.6028         0.0509         0.1209
+U->U                       0.5592         0.1022          0.372
+S->U (TSTR)                0.9448           0.22         0.2417
+U->S (TRTS)                0.4908         0.0716         0.0854
+
+-- Fidelity (Synthetic vs UCI) --------------------------------------
+Frobenius dist (corr matrices): 2.5593
+DCR mean: 0.3124   DCR p5: 0.1753   Privacy: OK
+High-KS features: ['education_code', 'income_volatility_index', 'income_trend_slope', 'utility_reliability_score', 'avg_utility_delay_days', 'max_utility_delay_days', 'debt_to_inflow_ratio', 'savings_buffer_ratio']
+Good-KS features:  ['age']
+
+-- Outputs -----------------------------------------------------------
+  validation/results/uci_mapped.csv
+  validation/results/crosswalk_sample.csv
+  validation/results/experiment_results.json
+  validation/results/auc_comparison.png
+  validation/results/ks_comparison.png
+  validation/results/calibration_tstr.png
+  validation/results/policy_comparison.png
+  validation/results/fidelity_ks_wasserstein.csv
+  validation/results/fidelity_corr_synth.png
+  validation/results/fidelity_corr_uci.png
+  validation/results/fidelity_dcr_hist.png
+  validation/results/fidelity_summary.json
+
+Total runtime: 8.7s

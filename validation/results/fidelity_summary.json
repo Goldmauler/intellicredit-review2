@@ -1,0 +1,143 @@
+{
+  "features_compared": [
+    "age",
+    "education_code",
+    "avg_monthly_income",
+    "income_volatility_index",
+    "income_trend_slope",
+    "utility_reliability_score",
+    "avg_utility_delay_days",
+    "max_utility_delay_days",
+    "debt_to_inflow_ratio",
+    "savings_buffer_ratio"
+  ],
+  "features_missing": [],
+  "per_feature": {
+    "age": {
+      "synth_mean": 31.8471,
+      "uci_mean": 35.4855,
+      "synth_std": 7.3524,
+      "uci_std": 9.2178,
+      "ks_statistic": 0.1464,
+      "ks_pvalue": 0.0,
+      "wasserstein_normalized": 0.06273,
+      "fidelity_flag": "OK"
+    },
+    "education_code": {
+      "synth_mean": 2.8901,
+      "uci_mean": 3.9787,
+      "synth_std": 1.3353,
+      "uci_std": 1.0705,
+      "ks_statistic": 0.4236,
+      "ks_pvalue": 0.0,
+      "wasserstein_normalized": 0.21771,
+      "fidelity_flag": "[WARN] HIGH"
+    },
+    "avg_monthly_income": {
+      "synth_mean": 34427.2121,
+      "uci_mean": 27914.0538,
+      "synth_std": 18491.0637,
+      "uci_std": 21624.2498,
+      "ks_statistic": 0.2446,
+      "ks_pvalue": 0.0,
+      "wasserstein_normalized": 0.04313,
+      "fidelity_flag": "MODERATE"
+    },
+    "income_volatility_index": {
+      "synth_mean": 0.2803,
+      "uci_mean": 0.5906,
+      "synth_std": 0.0829,
+      "uci_std": 0.7865,
+      "ks_statistic": 0.3441,
+      "ks_pvalue": 0.0,
+      "wasserstein_normalized": 0.01691,
+      "fidelity_flag": "[WARN] HIGH"
+    },
+    "income_trend_slope": {
+      "synth_mean": -7.5959,
+      "uci_mean": 2631.7452,
+      "synth_std": 973.1031,
+      "uci_std": 9159.3998,
+      "ks_statistic": 0.306,
+      "ks_pvalue": 0.0,
+      "wasserstein_normalized": 0.01702,
+      "fidelity_flag": "[WARN] HIGH"
+    },
+    "utility_reliability_score": {
+      "synth_mean": 0.6888,
+      "uci_mean": 0.4305,
+      "synth_std": 0.1561,
+      "uci_std": 0.1295,
+      "ks_statistic": 0.8242,
+      "ks_pvalue": 0.0,
+      "wasserstein_normalized": 0.25828,
+      "fidelity_flag": "[WARN] HIGH"
+    },
+    "avg_utility_delay_days": {
+      "synth_mean": 3.9085,
+      "uci_mean": 8.4385,
+      "synth_std": 2.7603,
+      "uci_std": 18.0463,
+      "ks_statistic": 0.6254,
+      "ks_pvalue": 0.0,
+      "wasserstein_normalized": 0.04234,
+      "fidelity_flag": "[WARN] HIGH"
+    },
+    "max_utility_delay_days": {
+      "synth_mean": 23.2839,
+      "uci_mean": 20.466,
+      "synth_std": 15.428,
+      "uci_std": 32.205,
+      "ks_statistic": 0.6254,
+      "ks_pvalue": 0.0,
+      "wasserstein_normalized": 0.06908,
+      "fidelity_flag": "[WARN] HIGH"
+    },
+    "debt_to_inflow_ratio": {
+      "synth_mean": 0.1133,
+      "uci_mean": 0.3729,
+      "synth_std": 0.1138,
+      "uci_std": 0.3497,
+      "ks_statistic": 0.4292,
+      "ks_pvalue": 0.0,
+      "wasserstein_normalized": 0.13397,
+      "fidelity_flag": "[WARN] HIGH"
+    },
+    "savings_buffer_ratio": {
+      "synth_mean": 0.5844,
+      "uci_mean": 0.3704,
+      "synth_std": 0.1512,
+      "uci_std": 0.5907,
+      "ks_statistic": 0.6617,
+      "ks_pvalue": 0.0,
+      "wasserstein_normalized": 0.07821,
+      "fidelity_flag": "[WARN] HIGH"
+    }
+  },
+  "correlation_matrix_frobenius_distance": 2.5593,
+  "dcr": {
+    "sample_size_synthetic": 500,
+    "sample_size_real": 500,
+    "mean": 0.3124,
+    "p5": 0.1753,
+    "privacy_flag": "OK"
+  },
+  "overall_fidelity": {
+    "high_ks_features": [
+      "education_code",
+      "income_volatility_index",
+      "income_trend_slope",
+      "utility_reliability_score",
+      "avg_utility_delay_days",
+      "max_utility_delay_days",
+      "debt_to_inflow_ratio",
+      "savings_buffer_ratio"
+    ],
+    "moderate_ks_features": [
+      "avg_monthly_income"
+    ],
+    "good_ks_features": [
+      "age"
+    ]
+  }
+}
