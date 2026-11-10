@@ -42,7 +42,7 @@
 | Method 2 (Association Rules): data preparation & implementation | **2** | `07_R2_M2` Parts A–B, `models/arm_model_comparison.csv` |
 | Method 2: evaluation & interpretation | **3** | `07_R2_M2` Parts C–F, `models/association_rules.csv` |
 | Combined business insights & recommendations | **2** | `08_R2` Section 5, `reports/Review_2_Final_Report.md` |
-| Interactive dashboard or website (Mandatory) | **5** | `dashboard/app.py` (Streamlit, 11 tabs: see [Review 3](#review-3--proof-data-explorer-business-analytics-and-scenario-lab) and [Dashboard](#dashboard)) + `reports/interactive_dashboard.html` |
+| Interactive dashboard or website (Mandatory) | **5** | `dashboard/app.py` (Streamlit, 11 tabs: see [Review 3](#review-3--proof-data-explorer-method-tabs-and-scenario-lab) and [Dashboard](#dashboard)) + `reports/interactive_dashboard.html` |
 | Presentation & individual contribution | **3** | [Individual Contributions](#individual-contributions), `reports/project_management_and_contributions.md`, `reports/Review_2_Presentation_Slides.md` |
 | **Total** | **20** | |
 
@@ -115,15 +115,17 @@ Research evidence (72 verified sources, 29 open-access PDFs, benchmark tables, r
 
 ---
 
-## Review 3 — Proof, Data Explorer, Business Analytics and Scenario Lab
+## Review 3 — Proof, Data Explorer, Method Tabs and Scenario Lab
 
-The panel asked *"how do we know these numbers are real, and does the synthetic data behave like real data?"* Three new dashboard tabs and a re-runnable validation suite answer it. Nothing in them is typed in: every table is read from a file.
+The panel asked *"how do we know these numbers are real, and does the synthetic data behave like real data?"* New dashboard tabs and a re-runnable validation suite answer it. Nothing in them is typed in: every table is read from a file.
 
 | Dashboard tab | What it does | Computed from |
 |---|---|---|
 | **Proof & comparison** | The pipeline on 4 real credit datasets, realism tests of the synthetic data, comparison with published studies and existing products | `models/validation/*.csv`, `research/competitive_landscape.json` |
 | **Data explorer** | Browse, filter, profile and chart all 8 datasets; trace one borrower's 12 months | files in `data/` and `models/` |
-| **Business analytics** | Segment economics, what an approval rule is worth, risk deciles, pricing against risk, portfolio vintages | `data/borrower_profiles.csv`, the 6,000 test borrowers, `data/portfolio/loan_book.csv` |
+| **Review 1 models** | The 11 first-round models compared (AUC, accuracy trap, tuning gain, ROC, calibration, SHAP) and how the final model improved on them | `models/model_comparison.csv`, notebook 05 summary table, `models/underwriting_model_card.json` |
+| **Time series & rules** | Abstract view of Methods 1 and 2: SARIMAX history and 2025 forecast, forecasting-method accuracy, whether the 93 rules hold on unseen borrowers, the riskiest patterns; full rule explorer in an expander | `data/portfolio/portfolio_monthly.csv`, `models/ts_*.csv`, `models/association_rules.csv` |
+| **Insights & Validation** | UCI credit-card comparative study: TSTR / TRTS transfer, policy outcomes, data-fidelity audit and privacy check | `validation/results/*` (`python validation/run_all.py`) |
 | **Scenario lab** | Live what-if on the economy: forecast, expected credit loss, lending decisions and profit | SARIMAX refitted in `dashboard/scenario_core.py`; presets reproduce `models/ts_forecast_scenarios.csv` exactly |
 
 ```bash
@@ -209,7 +211,9 @@ intellicredit-review2/
 ├── dashboard/
 │   ├── app.py                          # Streamlit app: 11 tabs, shared decision function
 │   ├── explorer_tab.py                 # Data explorer
-│   ├── business_tab.py                 # Business analytics
+│   ├── review1_tab.py                  # Review 1 models
+│   ├── methods_tab.py                  # Time series & rules (Methods 1 and 2, abstract)
+│   ├── uci_tab.py                      # Insights & Validation (UCI comparative study)
 │   ├── scenario_tab.py · scenario_core.py   # Scenario lab and its SARIMAX engine
 │   └── validation_tab.py               # Proof & comparison
 ├── models/                             # model comparison, forecasts, rules, dashboard model
@@ -217,6 +221,7 @@ intellicredit-review2/
 │   └── validation/                     # validation-suite outputs read by the dashboard
 ├── reports/                            # final report draft, interactive HTML, screenshots, figures
 ├── research/                           # 72 sources, 29 PDFs, benchmark tables, competitive_landscape.json
+├── validation/                         # UCI comparative study: crosswalk, TSTR/TRTS, calibration, fidelity audit (run_all.py)
 └── scripts/
     ├── run_validation_suite.py         # Review 3: real-data benchmark and realism tests
     ├── build_fidelity_anchors.py       # synthetic statistics vs published figures
@@ -252,7 +257,7 @@ python scripts/build_fidelity_anchors.py
 # 4. Dashboard (run from the repository root so the theme in .streamlit/ applies)
 streamlit run dashboard/app.py
 ```
-The dashboard opens on **Start here**, which lists a 60-second demo path. Tabs: Start here, Data explorer, Business analytics, Score applicant, Scenario lab, Test borrowers, Economy outlook, Warning patterns, Real-data check, Proof & comparison, Model & data.
+The dashboard opens on **Start here**, which lists a 60-second demo path. Tabs: Start here, Data explorer, Score applicant, Scenario lab, Test borrowers, Review 1 models, Time series & rules, Real-data check, Proof & comparison, Insights & Validation, Model & data.
 All randomness is seeded (`42` for data and models, `2026` for the loan-book simulation), so re-running reproduces every number below.
 
 ---
@@ -308,9 +313,13 @@ All randomness is seeded (`42` for data and models, `2026` for the loan-book sim
 |---|---|
 | ![score applicant](reports/screenshots/dash_score.png) | ![scenario lab](reports/screenshots/dash_scenario.png) |
 
-| Business analytics | Proof & comparison |
+| Time series & rules | Review 1 models |
 |---|---|
-| ![business analytics](reports/screenshots/dash_business.png) | ![proof and comparison](reports/screenshots/dash_proof.png) |
+| ![time series and rules](reports/screenshots/dash_methods.png) | ![review 1 models](reports/screenshots/dash_review1.png) |
+
+![insights and validation](reports/screenshots/dash_uci.png)
+
+![proof and comparison](reports/screenshots/dash_proof.png)
 
 ![data explorer](reports/screenshots/dash_explorer.png)
 

@@ -5,12 +5,12 @@ A dashboard for lending to gig workers who have no credit-bureau history.
 
   * Score an applicant   -> chance of default (LightGBM) + decision + reasons (TreeSHAP) + path to approval
   * Test borrowers       -> 6,000 unseen borrowers: predicted risk vs what really happened
-  * Economy outlook      -> SARIMAX forecast of the portfolio default rate under 4 economic scenarios
-  * Warning patterns     -> 93 validated rules mined with Apriori / FP-Growth
+  * Review 1 models      -> the 11 first-round models compared (AUC, recall, calibration) and how the final model improved on them
+  * Time series & rules  -> Methods 1 and 2 in one abstract page: SARIMAX forecast and 93 validated Apriori / FP-Growth rules
   * Real-data check      -> both methods re-run on real IMF / World Bank / FRED / CFPB data
   * Proof & comparison   -> pipeline on 4 real credit datasets, realism tests, comparison with studies and products
   * Data explorer        -> browse, filter, profile and chart every dataset
-  * Business analytics   -> segments, approval-policy value, risk deciles, pricing, portfolio over time
+  * Insights & Validation -> synthetic data tested against the UCI credit-card data (TSTR / TRTS, policy outcomes, fidelity audit)
   * Scenario lab         -> live what-if on the economy with the SARIMAX model, expected losses and lending decisions
   * Model & data         -> model card, calibration and data provenance
 
@@ -43,7 +43,9 @@ from src.recourse import path_to_approval  # noqa: E402
 from validation_tab import render as render_proof  # noqa: E402
 from explorer_tab import render as render_explorer  # noqa: E402
 from scenario_tab import render as render_scenario  # noqa: E402
-from business_tab import render as render_business  # noqa: E402
+from methods_tab import render as render_methods  # noqa: E402
+from review1_tab import render as render_review1  # noqa: E402
+from uci_tab import render as render_uci  # noqa: E402
 from src.underwriting_model import (  # noqa: E402
     COST_OF_FUNDS, FEATURE_LABELS, LGD, MODEL_PATH, CARD_PATH, break_even_pd, build_features, risk_band,
 )
@@ -326,19 +328,29 @@ st.markdown(
     'tested on 6,000 unseen borrowers &nbsp;·&nbsp; checked on real data</div></div>',
     unsafe_allow_html=True)
 
-tab_start, tab_explore, tab_biz, tab_uw, tab_scen, tab_data, tab_port, tab_rules, tab_real, tab_proof, tab_model = st.tabs([
+tab_start, tab_explore, tab_uw, tab_scen, tab_data, tab_r1, tab_rules, tab_real, tab_proof, tab_uci, tab_model = st.tabs([
     "Start here",
     "Data explorer",
-    "Business analytics",
     "Score applicant",
     "Scenario lab",
     "Test borrowers",
-    "Economy outlook",
-    "Warning patterns",
+    "Review 1 models",
+    "Time series & rules",
     "Real-data check",
     "Proof & comparison",
+    "Insights & Validation",
     "Model & data",
 ])
+
+# Shared context handed to the tab modules (they each expose render(ctx))
+from types import SimpleNamespace  # noqa: E402
+
+_ctx = SimpleNamespace(
+    explain=explain, step=step, style_fig=style_fig, html_table=html_table, decide=decide, risk_band=risk_band, pretty=pretty,
+    ROOT=ROOT, DATA_DIR=DATA_DIR, MODELS_DIR=MODELS_DIR, LGD=LGD, COST_OF_FUNDS=COST_OF_FUNDS,
+    SCEN_COLORS=SCEN_COLORS, SCEN_LABELS=SCEN_LABELS, item_defs=item_defs, scen=scen,
+    borrowers=borrowers, test_borrowers=test_borrowers, pm=pm, macro=macro, impact=impact, rules=rules, card=card,
+)
 
 # ============================================================================================== TAB 0: Start here
 with tab_start:
@@ -360,9 +372,9 @@ with tab_start:
             "<b>3.</b> In the left sidebar choose <b>Severe downturn</b>. Customer 2 flips to <b>Decline</b>: the same person is a worse risk when the economy is bad.")
 
     explain("<b>Defending the project?</b> Open <b>Proof &amp; comparison</b>. It shows the method running on four real credit datasets, how realistic the made-up borrower data is "
-            "(including where it falls short), and how the work compares with published studies and existing products.")
+            "(including where it falls short), and how the work compares with published studies and existing products. <b>Insights &amp; Validation</b> tests the synthetic data against the UCI credit-card data.")
 
-    explain("<b>Want to explore or test ideas?</b> <b>Data explorer</b> lets you browse and filter every dataset. <b>Business analytics</b> reviews who defaults, who makes money and what an approval rule is worth. "
+    explain("<b>Want to explore or test ideas?</b> <b>Data explorer</b> lets you browse and filter every dataset. <b>Review 1 models</b> compares the first-round models. <b>Time series &amp; rules</b> summarises the two Review 2 methods. "
             "<b>Scenario lab</b> asks what happens to defaults, losses and decisions if the economy changes, and explains why.")
 
     st.markdown("### The three sample customers")
@@ -651,60 +663,8 @@ with tab_data:
                      height=350, width="stretch")
         st.download_button("Download these borrowers as CSV", table.to_csv(index=False).encode("utf-8"), "intellicredit_test_borrowers.csv", "text/csv")
 
-# ============================================================================================== TAB 3: Economy outlook
-with tab_port:
-    _ecl_year = int(scen["date"].dt.year.max())   # forecast year taken from the data, not from today's date
-    st.markdown("## Economy outlook")
-    explain("This tab looks at the <b>whole loan book</b> instead of one person. The chart shows the share of loans going 90+ days late each month: "
-            "the black line is history, and the coloured lines are forecasts for next year under three economies (shaded bands are the 80% range).")
-    k1, k2, k3, k4 = st.columns(4)
-    k1.metric("Latest monthly default rate", f"{pm['default_rate'].iloc[-1]:.2%}", help="Share of active loans that newly reached 90+ days late in the latest month.")
-    k2.metric("Active loans", f"{int(pm['active_loans'].iloc[-1]):,}")
-    k3.metric("Long-run default rate", f"{overlay['neutral_default_rate_pct']:.2f}%", help="The 'normal economy' level that the scenarios are compared with.")
-    k4.metric("Forecast method", "SARIMAX", help=overlay["model"])
-
-    show_scen = st.multiselect("Scenarios to show", list(SCEN_COLORS), default=list(SCEN_COLORS), format_func=lambda k: SCEN_LABELS.get(k, k))
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(x=pm["date"], y=pm["default_rate"] * 100, name="History", line=dict(color="#1f1f1f", width=2.4)))
-    if st.checkbox("Also show the early-warning series (loans 30+ days late)"):
-        fig.add_trace(go.Scatter(x=pm["date"], y=pm["dpd30_plus_rate"] * 100, name="30+ days late", line=dict(color="#8a8577", dash="dot")))
-    for name in show_scen:
-        g = scen[scen["scenario"] == name]
-        fig.add_trace(go.Scatter(x=pd.concat([g["date"], g["date"][::-1]]), y=pd.concat([g["upper80"], g["lower80"][::-1]]),
-                                 fill="toself", fillcolor=SCEN_COLORS[name], opacity=0.15, line=dict(width=0), showlegend=False, hoverinfo="skip"))
-        fig.add_trace(go.Scatter(x=g["date"], y=g["forecast"], name=SCEN_LABELS.get(name, name), line=dict(color=SCEN_COLORS[name], width=2.6)))
-    fig.add_vrect(x0="2020-03-01", x1="2020-08-01", fillcolor="#8a8577", opacity=0.16, line_width=0, annotation_text="COVID lockdowns")
-    fig.update_layout(yaxis_title="% of active loans newly 90+ days late", hovermode="x unified", xaxis=dict(rangeslider=dict(visible=True)),
-                      legend=dict(orientation="h", y=1.08))
-    st.plotly_chart(style_fig(fig, 470), width="stretch", config={"displayModeBar": False})
-
-    st.markdown(f"### What it could cost in {_ecl_year}")
-    st.caption("Expected credit loss (ECL) = expected defaults × loan exposure × 65% not recovered. 1 lakh = ₹100,000.")
-    imp = impact.rename(columns={"avg monthly default rate %": "Avg monthly default rate (%)", "peak month rate %": "Peak month (%)",
-                                 f"expected defaults {_ecl_year}": "Expected defaults", "expected credit loss (INR lakh)": "Expected loss (₹ lakh)",
-                                 "extra loss vs baseline (INR lakh)": "Extra vs baseline (₹ lakh)"})
-    imp.index = [SCEN_LABELS.get(i, i) for i in imp.index]
-    imp.index.name = "Scenario"
-    st.dataframe(imp.style.format({"Avg monthly default rate (%)": "{:.2f}", "Peak month (%)": "{:.2f}", "Expected defaults": "{:,.0f}",
-                                   "Expected loss (₹ lakh)": "{:,.1f}", "Extra vs baseline (₹ lakh)": "{:+,.1f}"}), width="stretch")
-
-    st.markdown("### How accurate was the forecast?")
-    st.caption("Each method forecast the 12 months of 2024, which it had not seen. Errors are in percentage points: lower is better, best in green.")
-    st.dataframe(ts_cmp[["MAE (pp)", "RMSE (pp)", "MAPE %"]].style.format("{:.3f}").highlight_min(color="#dfeadb"), width="stretch")
-
-    st.markdown("### The economic indicators behind the forecast")
-    st.caption("Real data from the Federal Reserve (FRED) and the World Bank.")
-    nice = {"unemployment_rate": "Unemployment rate", "gdp_growth": "GDP growth", "cpi_inflation_yoy": "Inflation (CPI, year on year)",
-            "call_money_rate": "Call-money interest rate", "gsec_10y_yield": "10-year government bond yield", "inr_per_usd": "Rupees per US dollar"}
-    indicator = st.selectbox("Indicator", list(nice), format_func=lambda k: nice[k])
-    src_info = sources["columns"].get(indicator, {})
-    figm = px.line(macro[macro["date"] >= "2018-01-01"], x="date", y=indicator, labels={"date": "", indicator: nice[indicator]},
-                   title=f"{nice[indicator]} · source: {src_info.get('api', '')} {src_info.get('series_id', src_info.get('indicator_id', ''))}")
-    st.plotly_chart(style_fig(figm, 320), width="stretch", config={"displayModeBar": False})
-
-# ============================================================================================== TAB 4: Warning patterns
-with tab_rules:
-    st.markdown("## Warning patterns")
+# ============================================================================================== Warning-pattern explorer (shown in an expander on the Time series & rules tab)
+def _warning_explorer():
     explain("A warning pattern is a <b>combination of behaviours</b> that went with far more defaults than average, for example "
             "<i>declining income + bumpy income + low savings</i>. They were mined from 24,000 borrowers and then <b>checked on 6,000 different borrowers</b> "
             "(Apriori / FP-Growth, notebook 07). Higher on the chart means riskier; further right means it affects more people.")
@@ -874,17 +834,16 @@ with tab_proof:
         st.warning("Run `python -m src.real_data` and notebook 09 first.")
 
 
-# ============================================================================================== NEW TABS: Data explorer, Business analytics, Scenario lab
-from types import SimpleNamespace  # noqa: E402
-
-_ctx = SimpleNamespace(
-    explain=explain, step=step, style_fig=style_fig, html_table=html_table, decide=decide, risk_band=risk_band,
-    DATA_DIR=DATA_DIR, MODELS_DIR=MODELS_DIR, LGD=LGD, COST_OF_FUNDS=COST_OF_FUNDS,
-    borrowers=borrowers, test_borrowers=test_borrowers, pm=pm, macro=macro, impact=impact, rules=rules, card=card,
-)
+# ============================================================================================== Data explorer, Scenario lab, Review 1 models, Insights & Validation
 with tab_explore:
     render_explorer(_ctx)
-with tab_biz:
-    render_business(_ctx)
 with tab_scen:
     render_scenario(_ctx)
+with tab_r1:
+    render_review1(_ctx)
+with tab_rules:
+    render_methods(_ctx)
+    with st.expander("Explore all 93 warning patterns (interactive)"):
+        _warning_explorer()
+with tab_uci:
+    render_uci(_ctx)

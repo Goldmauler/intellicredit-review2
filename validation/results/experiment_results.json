@@ -1,0 +1,92 @@
+{
+  "S->S": {
+    "label": "S->S (baseline)",
+    "n_test": 6000,
+    "default_rate_test": 0.0787,
+    "mean_predicted_pd": 0.0794,
+    "auc": 0.7406,
+    "pr_auc": 0.1989,
+    "ks": 0.3571,
+    "brier": 0.06808,
+    "ece": 0.00486,
+    "mce": 0.07879,
+    "policy": {
+      "approval_rate": 0.6028,
+      "default_rate_approved": 0.0509,
+      "default_rate_declined": 0.1209
+    }
+  },
+  "U->U": {
+    "label": "U->U (UCI ceiling)",
+    "n_test": 6000,
+    "default_rate_test": 0.2212,
+    "mean_predicted_pd": 0.2213,
+    "auc": 0.77,
+    "pr_auc": 0.533,
+    "ks": 0.4041,
+    "brier": 0.14004,
+    "ece": 0.01446,
+    "mce": 0.15952,
+    "policy": {
+      "break_even_pd": 0.1667,
+      "approval_rate": 0.5592,
+      "default_rate_approved": 0.1022,
+      "default_rate_declined": 0.372,
+      "n_approved": 3355,
+      "n_declined": 2645
+    }
+  },
+  "S->U (TSTR)": {
+    "label": "S->U (TSTR)",
+    "n_test": 6000,
+    "default_rate_test": 0.2212,
+    "mean_predicted_pd": 0.088,
+    "auc": 0.5169,
+    "pr_auc": 0.2344,
+    "ks": 0.057,
+    "brier": 0.19161,
+    "ece": 0.1358,
+    "mce": 0.16772,
+    "policy": {
+      "break_even_pd": 0.1667,
+      "approval_rate": 0.9448,
+      "default_rate_approved": 0.22,
+      "default_rate_declined": 0.2417,
+      "n_approved": 5669,
+      "n_declined": 331
+    }
+  },
+  "U->S (TRTS)": {
+    "label": "U->S (TRTS)",
+    "n_test": 6000,
+    "default_rate_test": 0.0787,
+    "mean_predicted_pd": 0.0928,
+    "auc": 0.5607,
+    "pr_auc": 0.0969,
+    "ks": 0.0974,
+    "brier": 0.07315,
+    "ece": 0.01418,
+    "mce": 0.32599,
+    "policy": {
+      "approval_rate": 0.4908,
+      "default_rate_approved": 0.0716,
+      "default_rate_declined": 0.0854
+    }
+  },
+  "S->U ablated": {
+    "label": "S->U ablated (real features only)",
+    "n_test": 6000,
+    "default_rate_test": 0.2212,
+    "mean_predicted_pd": 0.1776,
+    "auc": 0.5255,
+    "pr_auc": 0.2574,
+    "ks": 0.0642,
+    "brier": 0.18724,
+    "ece": 0.11493
+  },
+  "_summary": {
+    "auc_gap_SS_vs_TSTR": 0.2237,
+    "interpretation": "Strong domain mismatch (>0.15)",
+    "note": "AUC gap = S->S AUC minus S->U AUC. High gap = generator or domain mismatch."
+  }
+}

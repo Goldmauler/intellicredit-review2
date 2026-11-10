@@ -5,7 +5,7 @@ A live what-if tool. Change the economy (and the lender's assumptions) and see, 
   1. the forecast default rate for 2025,   2. expected defaults and expected credit loss,
   3. what each shock contributed,          4. how lending decisions and expected profit change.
 The forecasting model is refitted from the files (scenario_core.py) so the Baseline, Adverse and Severe presets
-reproduce the Economy outlook tab exactly.
+reproduce the Time series tab exactly.
 """
 import numpy as np
 import pandas as pd
@@ -62,7 +62,7 @@ def counts(dec, pit, prof, accept=None):
 def render(ctx):
     st.markdown("## Scenario lab")
     ctx.explain("Ask <b>what if the economy changes?</b> Move the sliders and the forecast, the expected losses and the lending decisions all update at once. "
-                "The model behind it is the SARIMAX forecaster, refitted live from the data files, so the three presets match the Economy outlook tab exactly.")
+                "The model behind it is the SARIMAX forecaster, refitted live from the data files, so the three presets match the Time series tab exactly.")
     E = engine(ctx.DATA_DIR)
     res, macro, base, neutral, coef, pm = E["res"], E["macro"], E["base"], E["neutral"], E["coef"], E["pm"]
 
