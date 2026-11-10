@@ -1,0 +1,102 @@
+
+================================================================================
+IntelliCredit - Data Dictionary
+================================================================================
+Generated: 2026-10-01 18:10:12
+Dataset Policy: All data programmatically generated (NO Kaggle/UCI/GitHub sources)
+
+================================================================================
+FILE: borrower_profiles.csv  (30,000 records)
+================================================================================
+
+DEMOGRAPHIC FEATURES:
+  borrower_id                   : Unique borrower identifier (BRW-XXXXXX)
+  borrower_name                 : Synthetic name (Faker library, en_IN locale)
+  age                           : Age in years (21-60, Normal dist, mean=32)
+  gender                        : Male / Female / Other
+  location_type                 : Metro / Tier-1 City / Tier-2 City / Semi-Urban / Rural
+  education_level               : Below 10th to Postgraduate
+  primary_gig_platform          : Primary gig-economy platform category
+  gig_tenure_months             : Months active on gig platform (1-120)
+  has_bank_account              : Whether borrower has a formal bank account (0/1)
+  num_dependents                : Number of financial dependents (0-5)
+
+AGGREGATED BEHAVIORAL FEATURES (from 12-month transaction history):
+  avg_monthly_income            : Mean monthly gig platform earnings (INR)
+  std_monthly_income            : Std deviation of monthly earnings
+  min_monthly_income            : Lowest monthly earning in 12 months
+  max_monthly_income            : Highest monthly earning in 12 months
+  total_utility_bills           : Number of utility bill invoices (12)
+  utility_on_time_count         : Bills paid on time out of 12
+  avg_utility_delay_days        : Average delay in days when payment was late
+  max_utility_delay_days        : Maximum delay recorded
+  avg_days_between_recharges    : Average gap between mobile recharges (days)
+  total_bnpl_transactions       : Total BNPL/micro-loan transactions in 12 months
+  avg_bnpl_monthly_amount       : Average monthly BNPL obligation (INR)
+  max_bnpl_monthly_amount       : Peak BNPL obligation month (INR)
+  avg_monthly_outflow           : Mean monthly total spending (INR)
+  avg_eom_balance               : Average end-of-month bank balance (INR)
+  min_eom_balance               : Minimum EOM balance (liquidity floor)
+  avg_app_logins                : Average monthly app login count
+  avg_upi_transactions          : Average monthly UPI digital payments
+
+ENGINEERED FINANCIAL FEATURES:
+  income_volatility_index       : Coefficient of Variation (std/mean) of income
+  utility_reliability_score     : On-time utility payments / Total bills
+  debt_to_inflow_ratio          : Avg BNPL amount / Avg monthly income
+  savings_buffer_ratio          : Avg EOM balance / Avg monthly outflow
+  income_trend_slope            : Linear slope of 12-month income trajectory
+
+LOAN REQUEST FEATURES:
+  loan_amount_requested         : Requested micro-loan amount (INR)
+  loan_tenure_months            : Requested loan duration (3-24 months)
+  interest_rate_annual          : Assigned annual interest rate (%)
+  previous_micro_loans          : Count of prior micro-loans taken
+  previous_loans_repaid_on_time : Count of prior loans repaid without default
+
+TARGET VARIABLE:
+  default_probability_true      : True underlying default probability (for analysis)
+  loan_default_status           : Binary (0=Non-Default, 1=Default/90-day delinquent)
+
+================================================================================
+FILE: monthly_transactions.csv  (360,000 records)
+================================================================================
+  borrower_id                   : Foreign key to borrower_profiles
+  month_index                   : Month number (1-12)
+  month_label                   : Calendar month (YYYY-MM)
+  gig_income                    : Gig platform earnings for that month (INR)
+  utility_bill_amount           : Utility bill amount (INR)
+  utility_paid_on_time          : Whether paid on time (0/1)
+  utility_delay_days            : Days delayed (0 if on time)
+  mobile_recharge_amount        : Mobile recharge value (INR)
+  days_between_recharges        : Days gap since last recharge
+  bnpl_transaction_count        : BNPL transactions that month
+  bnpl_total_amount             : Total BNPL spend that month (INR)
+  monthly_outflow               : Total outgoing spending (INR)
+  end_of_month_balance          : Closing bank balance (INR)
+  app_login_count               : App engagement (login count)
+  upi_transaction_count         : Digital payment transactions
+
+================================================================================
+FILE: macroeconomic_indicators.csv  (36 monthly records)
+================================================================================
+  date                          : Month start date
+  cpi_inflation_rate            : Consumer Price Index inflation (%)
+  benchmark_interest_rate       : Central bank benchmark rate (%)
+  unemployment_rate             : Civilian unemployment rate (%)
+  consumer_confidence_index     : Consumer confidence (50-110 scale)
+  portfolio_default_rate        : Aggregate micro-lending default rate
+
+================================================================================
+DATA GENERATION METHODOLOGY
+================================================================================
+- Demographics: Faker library (en_IN) + numpy statistical distributions
+- Transaction correlations: Features interdependent via conditional probability
+  (e.g., utility payment punctuality depends on income stability)
+- Default labels: Logistic sigmoid function driven by behavioral feature
+  combination (income volatility, utility reliability, debt ratio, savings
+  buffer, gig tenure, digital engagement, income trend)
+- Macroeconomic data: Synthetic time-series with trend, seasonality, and
+  inter-variable correlation
+- All operations fully vectorized using NumPy (no row-level Python loops)
+================================================================================
