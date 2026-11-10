@@ -2,6 +2,10 @@
 IntelliCredit - Shared Configuration
 =====================================
 Central configuration used by all 5 member notebooks.
+
+Everything here is a plain module-level constant (paths, column roles, modelling
+parameters). Nothing is computed at import time other than path joins, so importing
+this module has no side effects and is safe from notebooks, scripts and the dashboard.
 """
 
 import os
@@ -9,6 +13,7 @@ import os
 # ============================================================================
 # PATHS
 # ============================================================================
+# Resolved relative to this file so the project runs from any working directory
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = os.path.join(PROJECT_ROOT, "data")
 PROCESSED_DIR = os.path.join(DATA_DIR, "processed")
@@ -37,14 +42,18 @@ TRAIN_SMOTE_PATH = os.path.join(PROCESSED_DIR, "train_smote.csv")
 # ============================================================================
 # COLUMN DEFINITIONS
 # ============================================================================
+# Binary label: 1 = borrower defaulted, 0 = repaid
 TARGET_COL = "loan_default_status"
 ID_COL = "borrower_id"
+# Identifiers and the simulator's hidden ground-truth PD must never reach the model (leakage)
 DROP_COLS = ["borrower_id", "borrower_name", "default_probability_true"]
 
+# Nominal columns that get one-hot encoding (ordinal ones are handled by ORDINAL_MAPS)
 CATEGORICAL_COLS = [
     "gender", "location_type", "education_level", "primary_gig_platform"
 ]
 
+# Ordered categories mapped to integers so the order is preserved for tree and linear models
 ORDINAL_MAPS = {
     "education_level": {
         "Below 10th": 0, "10th Pass": 1, "12th Pass": 2,
@@ -56,6 +65,7 @@ ORDINAL_MAPS = {
     }
 }
 
+# Heavy-tailed numeric columns clipped to percentile bounds during cleaning (M1)
 NUMERIC_COLS_TO_WINSORIZE = [
     "avg_monthly_income", "std_monthly_income", "min_monthly_income",
     "max_monthly_income", "avg_utility_delay_days", "max_utility_delay_days",
@@ -68,7 +78,8 @@ NUMERIC_COLS_TO_WINSORIZE = [
 # ============================================================================
 # MODELLING PARAMETERS
 # ============================================================================
+# Fixed seed so every notebook and script reproduces the same split and model
 RANDOM_STATE = 42
-TEST_SIZE = 0.2
-CV_FOLDS = 5
-SMOTE_STRATEGY = "auto"
+TEST_SIZE = 0.2          # 80/20 stratified train/test split
+CV_FOLDS = 5             # stratified k-fold used for cross-validation
+SMOTE_STRATEGY = "auto"  # oversample the minority (default) class to parity, training data only
