@@ -355,7 +355,7 @@ with tab_start:
                 'flag people who default <b>about three times</b> as often as average.</p></div>', unsafe_allow_html=True)
 
     st.markdown("### Try it in 60 seconds")
-    explain("<b>1.</b> Open the <b>Score applicant</b> tab and pick <b>Customer 3</b>, then press <b>Score applicant</b>. It is declined, and the screen shows why.<br>"
+    explain("<b>1.</b> Open the <b>Score applicant</b> tab and pick <b>Customer 3</b>. It is declined, and the screen shows why.<br>"
             "<b>2.</b> Pick <b>Customer 2</b>. It is approved <i>with conditions</i>.<br>"
             "<b>3.</b> In the left sidebar choose <b>Severe downturn</b>. Customer 2 flips to <b>Decline</b>: the same person is a worse risk when the economy is bad.")
 
@@ -390,176 +390,202 @@ with tab_start:
 
 # ============================================================================================== TAB 1: Score an applicant
 with tab_uw:
-    st.markdown("## Score an applicant")
-    explain("Pick a person, check the details, press <b>Score applicant</b>. The decision appears on the right. Scroll down for <b>why</b> and <b>what could change it</b>.")
+    @st.fragment
+    def _score_tab():
+        st.markdown("## Score an applicant")
+        explain("Pick a person and change any detail. The decision on the right <b>updates instantly</b>. Scroll down for <b>why</b> and <b>what could change it</b>.")
 
-    step(1, "Who is applying?")
-    cust_keys = list(PRESETS.keys())
-    quick_options = ["Customer 1 · Prime", "Customer 2 · Stressed", "Customer 3 · High-risk", "Custom · your own"]
-    customer_sel = st.radio("Select an applicant", quick_options, index=0, horizontal=True, label_visibility="collapsed")
+        step(1, "Who is applying?")
+        cust_keys = list(PRESETS.keys())
+        quick_options = ["Customer 1 · Prime", "Customer 2 · Stressed", "Customer 3 · High-risk", "Custom · your own"]
+        customer_sel = st.radio("Select an applicant", quick_options, index=0, horizontal=True, label_visibility="collapsed")
 
-    if customer_sel == quick_options[0]:
-        base = pd.Series(PRESETS[cust_keys[0]])
-        st.markdown('<div class="who ok"><b>Expected: Approve.</b> Three years on the platform, pays all 12 bills on time, low buy-now-pay-later, income growing.</div>', unsafe_allow_html=True)
-    elif customer_sel == quick_options[1]:
-        base = pd.Series(PRESETS[cust_keys[1]])
-        st.markdown('<div class="who cond"><b>Expected: Approve with conditions.</b> Eight months on the platform, about 6 days late on bills, higher buy-now-pay-later, income falling.</div>', unsafe_allow_html=True)
-    elif customer_sel == quick_options[2]:
-        base = pd.Series(PRESETS[cust_keys[2]])
-        st.markdown('<div class="who no"><b>Expected: Decline.</b> Two months on the platform, no bank account, about 18 days late on bills, 75 warning patterns triggered.</div>', unsafe_allow_html=True)
-    else:
-        base = borrowers.drop(columns=["borrower_id"]).median(numeric_only=True)
-        base["location_type"], base["education_level"] = "Tier-2 City", "Undergraduate"
-        st.markdown('<div class="who custom"><b>Custom applicant.</b> Starts from the median borrower. Change any value below, then press Score applicant.</div>', unsafe_allow_html=True)
-
-    form_col, result_col = st.columns([5, 6.4], gap="large")
-    form_slug = "".join(c if c.isalnum() else "_" for c in customer_sel).strip("_")
-
-    with form_col:
-        step(2, "Check the details")
-        with st.form(f"applicant_form_{form_slug}"):
-            a, b = st.columns(2)
-            age = a.number_input("Age", 21, 60, int(base["age"]))
-            tenure_gig = b.number_input("Months on gig platforms", 1, 120, int(base["gig_tenure_months"]), help="How long the person has been earning from gig work. Newer workers are riskier.")
-            loc_opts = ["Metro", "Tier-1 City", "Tier-2 City", "Semi-Urban", "Rural"]
-            edu_opts = ["Below 10th", "10th Pass", "12th Pass", "Diploma", "Undergraduate", "Postgraduate"]
-            location = a.selectbox("Location", loc_opts, index=loc_opts.index(base["location_type"]))
-            education = b.selectbox("Education", edu_opts, index=edu_opts.index(base["education_level"]))
-            income = a.number_input("Monthly gig income (₹)", 2000.0, 150000.0, float(base["avg_monthly_income"]), step=500.0)
-            on_time = b.slider("Bills paid on time (of 12)", 0, 12, int(base["utility_on_time_count"]), help="Out of the last 12 utility bills, how many were paid on time.")
-            amount = a.number_input("Loan amount asked (₹)", 5000.0, 300000.0, float(base["loan_amount_requested"]), step=1000.0)
-            tenure_opts = [3, 6, 9, 12, 18, 24]
-            tenure = b.selectbox("Loan length (months)", tenure_opts, index=tenure_opts.index(int(base["loan_tenure_months"])))
-
-            with st.expander("More details (filled in automatically; change only if you know them)"):
-                a1, a2 = st.columns(2)
-                dependents = a1.number_input("Dependents", 0, 5, int(base["num_dependents"]))
-                bank = a2.selectbox("Has a bank account", [1, 0], index=0 if int(base["has_bank_account"]) == 1 else 1, format_func=lambda v: "Yes" if v else "No")
-                income_sd = a1.number_input("How much income varies (₹, std-dev)", 0.0, 80000.0, float(base["std_monthly_income"]), step=250.0, help="Bigger means a bumpier income from month to month.")
-                trend = a2.number_input("Income trend (₹ per month)", -5000.0, 5000.0, float(base["income_trend_slope"]), step=50.0, help="Negative means income is falling.")
-                avg_delay = a1.number_input("Average bill delay (days)", 0.0, 90.0, float(base["avg_utility_delay_days"]), step=0.5)
-                max_delay = a2.number_input("Worst bill delay (days)", 0, 90, int(base["max_utility_delay_days"]))
-                recharge = a1.number_input("Days between phone recharges", 10.0, 60.0, float(base["avg_days_between_recharges"]), step=0.5)
-                bnpl = a2.number_input("Buy-now-pay-later spend (₹ / month)", 0.0, 60000.0, float(base["avg_bnpl_monthly_amount"]), step=250.0)
-                outflow = a1.number_input("Monthly spending (₹)", 500.0, 160000.0, float(base["avg_monthly_outflow"]), step=500.0)
-                balance = a2.number_input("Month-end balance (₹)", 0.0, 100000.0, float(base["avg_eom_balance"]), step=250.0)
-                logins = a1.number_input("App logins per month", 0.0, 90.0, float(base["avg_app_logins"]), step=0.5)
-                upi = a2.number_input("UPI payments per month", 0.0, 80.0, float(base["avg_upi_transactions"]), step=0.5)
-                rate = a1.number_input("Interest rate (% a year)", 8.0, 36.0, float(base["interest_rate_annual"]), step=0.25)
-                prev = a2.number_input("Earlier micro-loans", 0, 15, int(base["previous_micro_loans"]))
-                prev_ok = a1.number_input("…of which repaid on time", 0, 15, min(int(base["previous_loans_repaid_on_time"]), 15))
-
-            st.form_submit_button("Score applicant", type="primary")
-
-    raw = pd.DataFrame([{
-        "age": age, "gig_tenure_months": tenure_gig, "has_bank_account": bank, "num_dependents": dependents,
-        "location_type": location, "education_level": education, "avg_monthly_income": income,
-        "std_monthly_income": income_sd, "income_trend_slope": trend, "utility_on_time_count": on_time,
-        "avg_utility_delay_days": avg_delay, "max_utility_delay_days": max_delay,
-        "avg_days_between_recharges": recharge, "avg_bnpl_monthly_amount": bnpl, "avg_monthly_outflow": outflow,
-        "avg_eom_balance": balance, "avg_app_logins": logins, "avg_upi_transactions": upi,
-        "loan_amount_requested": amount, "loan_tenure_months": tenure, "interest_rate_annual": rate,
-        "previous_micro_loans": prev, "previous_loans_repaid_on_time": min(prev_ok, prev),
-    }])
-    X = build_features(raw)
-    pd_ttc = float(model.predict_proba(X)[0, 1])
-    pd_pit = min(pd_ttc * mult, 0.99)
-    be = float(np.atleast_1d(break_even_pd(rate, tenure))[0])
-    band = risk_band(pd_pit)
-    flags = flag_items(raw, item_defs).iloc[0]
-    hits = triggered_rules(flags, rules)
-    expected_loss = pd_pit * LGD * amount
-    suggested_rate = BAND_RATES.get(band, 22.0)
-
-    verdict = str(decide(pd_pit, be, band, len(hits)))
-    if verdict == "DECLINE":
-        decision, css, reason = "Decline", "v-no", (
-            f"The chance of default ({pd_pit:.1%}) is above the break-even limit ({be:.1%}) for this interest rate and loan length, so the lender would lose money on average."
-            if pd_pit >= be else
-            f"Severe credit risk (risk grade {band}, default chance {pd_pit:.1%}) with {len(hits)} warning patterns triggered: automatic decline.")
-    elif verdict == "CONDITIONS":
-        decision, css, reason = "Approve with conditions", "v-cond", (
-            f"Profitable on average, but {len(hits)} warning pattern(s) fire (risk grade {band}). Offer a smaller loan or weekly repayments.")
-    else:
-        decision, css, reason = "Approve", "v-ok", (
-            f"The chance of default ({pd_pit:.1%}) is comfortably below the break-even limit ({be:.1%}), with no worrying behaviour patterns.")
-
-    with result_col:
-        step(3, "The decision")
-        st.markdown(f'<div class="verdict {css}"><div class="v-label">Decision</div><div class="v-title">{decision}</div>'
-                    f'<div class="v-sub">{reason}</div></div>', unsafe_allow_html=True)
-        st.plotly_chart(risk_gauge(pd_pit, be), width="stretch", config={"displayModeBar": False})
-        st.caption("The diamond is this applicant's chance of default. Left of the dashed line the lender makes money on average; right of it the lender loses. Letters are the risk grades.")
-        m1, m2, m3 = st.columns(3)
-        m1.metric("Chance of default", f"{pd_pit:.1%}", delta=f"{(mult - 1) * 100:+.0f}% vs normal", delta_color="inverse",
-                  help="Chance this applicant defaults, after adjusting for the economy scenario chosen in the sidebar.")
-        m2.metric("Normal economy", f"{pd_ttc:.1%}", help="The model's raw estimate before any economy adjustment.")
-        m3.metric("Risk grade", f"{band}", delta=BAND_MEANING[band], delta_color="off", help="A is safest (under 4%), E is riskiest (16% or more).")
-        m4, m5, m6 = st.columns(3)
-        m4.metric("Break-even limit", f"{be:.1%}", help="Highest default chance the lender can profitably accept at this interest rate and loan length.")
-        m5.metric("Expected loss", f"₹{expected_loss:,.0f}", help="Default chance × loan amount × 65% (the share of a defaulted loan not recovered).")
-        m6.metric("Suggested rate", f"{suggested_rate:.1f}%", help=f"Interest rate the lender's price list suggests for risk grade {band}.")
-
-    # -------------------------------------------------------------------- same applicant, every economy
-    st.markdown("### Same applicant, different economies")
-    explain("The same person can get a different answer when the economy changes. This is what the sidebar switch does.")
-    rows = []
-    for k, m_ in multipliers.items():
-        p_ = min(pd_ttc * m_, 0.99); b_ = risk_band(p_)
-        d_ = str(decide(p_, be, b_, len(hits)))
-        rows.append({"Economy": SCEN_LABELS.get(k, k), "Risk multiplier": f"{m_:.2f}x", "Default chance": f"{p_:.1%}", "Risk grade": b_,
-                     "Decision": {"DECLINE": "Decline", "CONDITIONS": "Approve with conditions", "APPROVE": "Approve"}[d_]})
-    _sty = pd.DataFrame(rows).style
-    _sty = (_sty.map if hasattr(_sty, "map") else _sty.applymap)(colour_decision, subset=["Decision"])
-    st.dataframe(_sty, hide_index=True, width="stretch")
-
-    # -------------------------------------------------------------------- why
-    st.markdown("### Why this decision?")
-    left, right = st.columns([1.15, 1], gap="large")
-    with left:
-        st.markdown("**What pushed the risk up or down**")
-        st.caption("Red bars raise the chance of default, green bars lower it. A longer bar means a bigger effect. (TreeSHAP explanation of the model.)")
-        contrib = model.predict(X, pred_contrib=True)[0]   # TreeSHAP values in log-odds; last column = base value
-        contrib = pd.Series(contrib[:-1], index=X.columns)
-        top = contrib.reindex(contrib.abs().sort_values(ascending=False).index).head(10)[::-1]
-        fig = go.Figure(go.Bar(x=top.values, y=[FEATURE_LABELS.get(c, c) for c in top.index], orientation="h",
-                               marker_color=["#9b2c2c" if v > 0 else "#3d6b4f" for v in top.values],
-                               hovertemplate="%{y}: %{x:+.3f}<extra></extra>"))
-        fig.update_layout(xaxis_title="Lowers risk (left)  ·  Raises risk (right)")
-        style_fig(fig, 400)
-        st.plotly_chart(fig, width="stretch", config={"displayModeBar": False})
-    with right:
-        st.markdown(f"**Warning patterns found: {len(hits)}**")
-        st.caption("Behaviour combinations that, in past data, went with many more defaults than average.")
-        present = [i["item"] for i in item_defs["items"] if flags[i["item"]]]
-        if present:
-            st.markdown("".join(f'<span class="chip">{p.replace("_", " ").title()}</span>' for p in present), unsafe_allow_html=True)
+        if customer_sel == quick_options[0]:
+            base = pd.Series(PRESETS[cust_keys[0]])
+            st.markdown('<div class="who ok"><b>Expected: Approve.</b> Three years on the platform, pays all 12 bills on time, low buy-now-pay-later, income growing.</div>', unsafe_allow_html=True)
+        elif customer_sel == quick_options[1]:
+            base = pd.Series(PRESETS[cust_keys[1]])
+            st.markdown('<div class="who cond"><b>Expected: Approve with conditions.</b> Eight months on the platform, about 6 days late on bills, higher buy-now-pay-later, income falling.</div>', unsafe_allow_html=True)
+        elif customer_sel == quick_options[2]:
+            base = pd.Series(PRESETS[cust_keys[2]])
+            st.markdown('<div class="who no"><b>Expected: Decline.</b> Two months on the platform, no bank account, about 18 days late on bills, 75 warning patterns triggered.</div>', unsafe_allow_html=True)
         else:
-            st.markdown('<span class="chip none">No warning signs</span>', unsafe_allow_html=True)
-        if len(hits):
-            show = hits[["antecedent", "test_confidence", "test_lift"]].head(8).copy()
-            show["antecedent"] = show["antecedent"].map(pretty)
-            show = show.rename(columns={"antecedent": "Pattern", "test_confidence": "Default rate among similar people", "test_lift": "Times riskier than average"})
-            st.dataframe(show.style.format({"Default rate among similar people": "{:.1%}", "Times riskier than average": "{:.2f}x"}), hide_index=True, width="stretch")
-        else:
-            st.success("No validated warning pattern matches this applicant.")
+            base = borrowers.drop(columns=["borrower_id"]).median(numeric_only=True)
+            base["location_type"], base["education_level"] = "Tier-2 City", "Undergraduate"
+            st.markdown('<div class="who custom"><b>Custom applicant.</b> Starts from the median borrower. Change any value below and the decision updates straight away.</div>', unsafe_allow_html=True)
 
-    # -------------------------------------------------------------------- recourse
-    st.markdown("### What could change the outcome?")
-    if pd_pit >= be:
-        with st.spinner("Searching for realistic changes…"):
-            recourse = path_to_approval(model, raw.iloc[0], multiplier=mult)
-        if recourse.empty:
-            st.warning("No realistic change (smaller loan, other loan length, less buy-now-pay-later, better bill payment, more savings) brings this applicant "
-                       "below the break-even limit. Refer to a secured or group-lending product instead.")
+        form_col, result_col = st.columns([5, 6.4], gap="large")
+        form_slug = "".join(c if c.isalnum() else "_" for c in customer_sel).strip("_")
+        _nonce = st.session_state.get("score_reset", 0)
+        _k = lambda name: f"sc_{form_slug}_{_nonce}_{name}"
+
+        with form_col:
+            step(2, "Check the details")
+            st.caption("The decision on the right updates the moment you change a value.")
+            with st.container():
+                a, b = st.columns(2)
+                age = a.number_input("Age", 21, 60, int(base["age"]), key=_k("age"))
+                tenure_gig = b.number_input("Months on gig platforms", 1, 120, int(base["gig_tenure_months"]), help="How long the person has been earning from gig work. Newer workers are riskier.", key=_k("tenure_gig"))
+                loc_opts = ["Metro", "Tier-1 City", "Tier-2 City", "Semi-Urban", "Rural"]
+                edu_opts = ["Below 10th", "10th Pass", "12th Pass", "Diploma", "Undergraduate", "Postgraduate"]
+                location = a.selectbox("Location", loc_opts, index=loc_opts.index(base["location_type"]), key=_k("location"))
+                education = b.selectbox("Education", edu_opts, index=edu_opts.index(base["education_level"]), key=_k("education"))
+                income = a.number_input("Monthly gig income (₹)", 2000.0, 150000.0, float(base["avg_monthly_income"]), step=500.0, key=_k("income"))
+                on_time = b.slider("Bills paid on time (of 12)", 0, 12, int(base["utility_on_time_count"]), help="Out of the last 12 utility bills, how many were paid on time.", key=_k("on_time"))
+                amount = a.number_input("Loan amount asked (₹)", 5000.0, 300000.0, float(base["loan_amount_requested"]), step=1000.0, key=_k("amount"))
+                tenure_opts = [3, 6, 9, 12, 18, 24]
+                tenure = b.selectbox("Loan length (months)", tenure_opts, index=tenure_opts.index(int(base["loan_tenure_months"])), key=_k("tenure"))
+
+                with st.expander("More details (filled in automatically; change only if you know them)"):
+                    a1, a2 = st.columns(2)
+                    dependents = a1.number_input("Dependents", 0, 5, int(base["num_dependents"]), key=_k("dependents"))
+                    bank = a2.selectbox("Has a bank account", [1, 0], index=0 if int(base["has_bank_account"]) == 1 else 1, format_func=lambda v: "Yes" if v else "No", key=_k("bank"))
+                    income_sd = a1.number_input("How much income varies (₹, std-dev)", 0.0, 80000.0, float(base["std_monthly_income"]), step=250.0, help="Bigger means a bumpier income from month to month.", key=_k("income_sd"))
+                    trend = a2.number_input("Income trend (₹ per month)", -5000.0, 5000.0, float(base["income_trend_slope"]), step=50.0, help="Negative means income is falling.", key=_k("trend"))
+                    avg_delay = a1.number_input("Average bill delay (days)", 0.0, 90.0, float(base["avg_utility_delay_days"]), step=0.5, key=_k("avg_delay"))
+                    max_delay = a2.number_input("Worst bill delay (days)", 0, 90, int(base["max_utility_delay_days"]), key=_k("max_delay"))
+                    recharge = a1.number_input("Days between phone recharges", 10.0, 60.0, float(base["avg_days_between_recharges"]), step=0.5, key=_k("recharge"))
+                    bnpl = a2.number_input("Buy-now-pay-later spend (₹ / month)", 0.0, 60000.0, float(base["avg_bnpl_monthly_amount"]), step=250.0, key=_k("bnpl"))
+                    outflow = a1.number_input("Monthly spending (₹)", 500.0, 160000.0, float(base["avg_monthly_outflow"]), step=500.0, key=_k("outflow"))
+                    balance = a2.number_input("Month-end balance (₹)", 0.0, 100000.0, float(base["avg_eom_balance"]), step=250.0, key=_k("balance"))
+                    logins = a1.number_input("App logins per month", 0.0, 90.0, float(base["avg_app_logins"]), step=0.5, key=_k("logins"))
+                    upi = a2.number_input("UPI payments per month", 0.0, 80.0, float(base["avg_upi_transactions"]), step=0.5, key=_k("upi"))
+                    rate = a1.number_input("Interest rate (% a year)", 8.0, 36.0, float(base["interest_rate_annual"]), step=0.25, key=_k("rate"))
+                    prev = a2.number_input("Earlier micro-loans", 0, 15, int(base["previous_micro_loans"]), key=_k("prev"))
+                    prev_ok = a1.number_input("…of which repaid on time", 0, 15, min(int(base["previous_loans_repaid_on_time"]), 15), key=_k("prev_ok"))
+
+                if st.button("Reset to this applicant's original values", key=f"sc_reset_btn_{form_slug}"):
+                    st.session_state["score_reset"] = _nonce + 1
+                    st.rerun(scope="fragment")
+
+
+        raw = pd.DataFrame([{
+            "age": age, "gig_tenure_months": tenure_gig, "has_bank_account": bank, "num_dependents": dependents,
+            "location_type": location, "education_level": education, "avg_monthly_income": income,
+            "std_monthly_income": income_sd, "income_trend_slope": trend, "utility_on_time_count": on_time,
+            "avg_utility_delay_days": avg_delay, "max_utility_delay_days": max_delay,
+            "avg_days_between_recharges": recharge, "avg_bnpl_monthly_amount": bnpl, "avg_monthly_outflow": outflow,
+            "avg_eom_balance": balance, "avg_app_logins": logins, "avg_upi_transactions": upi,
+            "loan_amount_requested": amount, "loan_tenure_months": tenure, "interest_rate_annual": rate,
+            "previous_micro_loans": prev, "previous_loans_repaid_on_time": min(prev_ok, prev),
+        }])
+        X = build_features(raw)
+        pd_ttc = float(model.predict_proba(X)[0, 1])
+        pd_pit = min(pd_ttc * mult, 0.99)
+        be = float(np.atleast_1d(break_even_pd(rate, tenure))[0])
+        band = risk_band(pd_pit)
+        flags = flag_items(raw, item_defs).iloc[0]
+        hits = triggered_rules(flags, rules)
+        expected_loss = pd_pit * LGD * amount
+        suggested_rate = BAND_RATES.get(band, 22.0)
+
+        verdict = str(decide(pd_pit, be, band, len(hits)))
+        if verdict == "DECLINE":
+            decision, css, reason = "Decline", "v-no", (
+                f"The chance of default ({pd_pit:.1%}) is above the break-even limit ({be:.1%}) for this interest rate and loan length, so the lender would lose money on average."
+                if pd_pit >= be else
+                f"Severe credit risk (risk grade {band}, default chance {pd_pit:.1%}) with {len(hits)} warning patterns triggered: automatic decline.")
+        elif verdict == "CONDITIONS":
+            decision, css, reason = "Approve with conditions", "v-cond", (
+                f"Profitable on average, but {len(hits)} warning pattern(s) fire (risk grade {band}). Offer a smaller loan or weekly repayments.")
         else:
-            explain("These are the <b>cheapest different ways</b> this applicant could become profitable for the lender. Only things the applicant can change are used: "
-                    "age, location, education and the interest rate are never changed.")
-            st.dataframe(recourse.style.format({"new PD": "{:.1%}", "break-even PD": "{:.1%}"}), hide_index=True, width="stretch")
-            st.caption("Counterfactual explanations (Wachter et al. 2017) restricted to actionable features (Ustun et al. 2019) and kept diverse (Mothilal et al. 2020). Code: src/recourse.py")
-    else:
-        st.success(f"Nothing to change: the default chance ({pd_pit:.1%}) is already {100 * (be - pd_pit):.1f} points below the break-even limit. "
-                   "Pick **Severe downturn** in the sidebar to see this section work.")
+            decision, css, reason = "Approve", "v-ok", (
+                f"The chance of default ({pd_pit:.1%}) is comfortably below the break-even limit ({be:.1%}), with no worrying behaviour patterns.")
+
+        with result_col:
+            step(3, "The decision")
+            st.markdown(f'<div class="verdict {css}"><div class="v-label">Decision</div><div class="v-title">{decision}</div>'
+                        f'<div class="v-sub">{reason}</div></div>', unsafe_allow_html=True)
+            st.plotly_chart(risk_gauge(pd_pit, be), width="stretch", config={"displayModeBar": False})
+            st.caption("The diamond is this applicant's chance of default. Left of the dashed line the lender makes money on average; right of it the lender loses. Letters are the risk grades.")
+            m1, m2, m3 = st.columns(3)
+            m1.metric("Chance of default", f"{pd_pit:.1%}", delta=f"{(mult - 1) * 100:+.0f}% vs normal", delta_color="inverse",
+                      help="Chance this applicant defaults, after adjusting for the economy scenario chosen in the sidebar.")
+            m2.metric("Normal economy", f"{pd_ttc:.1%}", help="The model's raw estimate before any economy adjustment.")
+            m3.metric("Risk grade", f"{band}", delta=BAND_MEANING[band], delta_color="off", help="A is safest (under 4%), E is riskiest (16% or more).")
+            m4, m5, m6 = st.columns(3)
+            m4.metric("Break-even limit", f"{be:.1%}", help="Highest default chance the lender can profitably accept at this interest rate and loan length.")
+            m5.metric("Expected loss", f"₹{expected_loss:,.0f}", help="Default chance × loan amount × 65% (the share of a defaulted loan not recovered).")
+            m6.metric("Suggested rate", f"{suggested_rate:.1f}%", help=f"Interest rate the lender's price list suggests for risk grade {band}.")
+
+            # --- which test decided it (so the verdict is never a black box)
+            n_hits = len(hits)
+            tests = [
+                ("Profit test", "fail" if pd_pit >= be else "pass",
+                 f"Default chance {pd_pit:.1%} is {'at or above' if pd_pit >= be else 'below'} the break-even limit {be:.1%} (at or above = Decline)."),
+                ("Risk grade", "fail" if band == "E" else ("warn" if band in ("C", "D") else "pass"),
+                 f"Grade {band} ({BAND_MEANING[band]}). Grade E = Decline; C or D = Approve with conditions."),
+                ("Warning patterns", "fail" if n_hits >= 15 else ("warn" if n_hits >= 3 else "pass"),
+                 f"{n_hits} pattern(s) fire. 15 or more = Decline; 3 or more = Approve with conditions."),
+            ]
+            icon = {"pass": "✅", "warn": "⚠️", "fail": "⛔"}
+            st.markdown("**How the decision was reached**")
+            st.markdown("\n".join(f"- {icon[s]} **{n}:** {t}" for n, s, t in tests))
+            st.caption("The worst result of the three tests becomes the decision. This is why changing one detail sometimes does not change the decision: "
+                       "the applicant has to move across a threshold above, not just move a little.")
+
+        # -------------------------------------------------------------------- same applicant, every economy
+        st.markdown("### Same applicant, different economies")
+        explain("The same person can get a different answer when the economy changes. This is what the sidebar switch does.")
+        rows = []
+        for k, m_ in multipliers.items():
+            p_ = min(pd_ttc * m_, 0.99); b_ = risk_band(p_)
+            d_ = str(decide(p_, be, b_, len(hits)))
+            rows.append({"Economy": SCEN_LABELS.get(k, k), "Risk multiplier": f"{m_:.2f}x", "Default chance": f"{p_:.1%}", "Risk grade": b_,
+                         "Decision": {"DECLINE": "Decline", "CONDITIONS": "Approve with conditions", "APPROVE": "Approve"}[d_]})
+        _sty = pd.DataFrame(rows).style
+        _sty = (_sty.map if hasattr(_sty, "map") else _sty.applymap)(colour_decision, subset=["Decision"])
+        st.dataframe(_sty, hide_index=True, width="stretch")
+
+        # -------------------------------------------------------------------- why
+        st.markdown("### Why this decision?")
+        left, right = st.columns([1.15, 1], gap="large")
+        with left:
+            st.markdown("**What pushed the risk up or down**")
+            st.caption("Red bars raise the chance of default, green bars lower it. A longer bar means a bigger effect. (TreeSHAP explanation of the model.)")
+            contrib = model.predict(X, pred_contrib=True)[0]   # TreeSHAP values in log-odds; last column = base value
+            contrib = pd.Series(contrib[:-1], index=X.columns)
+            top = contrib.reindex(contrib.abs().sort_values(ascending=False).index).head(10)[::-1]
+            fig = go.Figure(go.Bar(x=top.values, y=[FEATURE_LABELS.get(c, c) for c in top.index], orientation="h",
+                                   marker_color=["#9b2c2c" if v > 0 else "#3d6b4f" for v in top.values],
+                                   hovertemplate="%{y}: %{x:+.3f}<extra></extra>"))
+            fig.update_layout(xaxis_title="Lowers risk (left)  ·  Raises risk (right)")
+            style_fig(fig, 400)
+            st.plotly_chart(fig, width="stretch", config={"displayModeBar": False})
+        with right:
+            st.markdown(f"**Warning patterns found: {len(hits)}**")
+            st.caption("Behaviour combinations that, in past data, went with many more defaults than average.")
+            present = [i["item"] for i in item_defs["items"] if flags[i["item"]]]
+            if present:
+                st.markdown("".join(f'<span class="chip">{p.replace("_", " ").title()}</span>' for p in present), unsafe_allow_html=True)
+            else:
+                st.markdown('<span class="chip none">No warning signs</span>', unsafe_allow_html=True)
+            if len(hits):
+                show = hits[["antecedent", "test_confidence", "test_lift"]].head(8).copy()
+                show["antecedent"] = show["antecedent"].map(pretty)
+                show = show.rename(columns={"antecedent": "Pattern", "test_confidence": "Default rate among similar people", "test_lift": "Times riskier than average"})
+                st.dataframe(show.style.format({"Default rate among similar people": "{:.1%}", "Times riskier than average": "{:.2f}x"}), hide_index=True, width="stretch")
+            else:
+                st.success("No validated warning pattern matches this applicant.")
+
+        # -------------------------------------------------------------------- recourse
+        st.markdown("### What could change the outcome?")
+        if pd_pit >= be:
+            with st.spinner("Searching for realistic changes…"):
+                recourse = path_to_approval(model, raw.iloc[0], multiplier=mult)
+            if recourse.empty:
+                st.warning("No realistic change (smaller loan, other loan length, less buy-now-pay-later, better bill payment, more savings) brings this applicant "
+                           "below the break-even limit. Refer to a secured or group-lending product instead.")
+            else:
+                explain("These are the <b>cheapest different ways</b> this applicant could become profitable for the lender. Only things the applicant can change are used: "
+                        "age, location, education and the interest rate are never changed.")
+                st.dataframe(recourse.style.format({"new PD": "{:.1%}", "break-even PD": "{:.1%}"}), hide_index=True, width="stretch")
+                st.caption("Counterfactual explanations (Wachter et al. 2017) restricted to actionable features (Ustun et al. 2019) and kept diverse (Mothilal et al. 2020). Code: src/recourse.py")
+        else:
+            st.success(f"Nothing to change: the default chance ({pd_pit:.1%}) is already {100 * (be - pd_pit):.1f} points below the break-even limit. "
+                       "Pick **Severe downturn** in the sidebar to see this section work.")
+
+    _score_tab()
 
 # ============================================================================================== TAB 2: Test borrowers
 with tab_data:
