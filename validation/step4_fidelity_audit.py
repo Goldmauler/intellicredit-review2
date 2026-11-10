@@ -54,6 +54,7 @@ DCR_N_REAL = 500        # real rows to compare against
 
 
 def run_fidelity_audit():
+    """Compare synthetic vs UCI feature distributions (KS, Wasserstein, correlations, DCR) and save results."""
     print("=" * 60)
     print("  Step 4: Synthetic Data Fidelity Audit")
     print("=" * 60)

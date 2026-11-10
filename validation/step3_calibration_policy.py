@@ -39,6 +39,7 @@ UCI_TENURE = 12
 
 
 def reliability_diagram(y_true, y_prob, n_bins=10, label="", ax=None, color="steelblue"):
+    """Plot observed default frequency vs mean predicted PD per bin; draws onto `ax` if given."""
     prob_true, prob_pred = calibration_curve(y_true, y_prob, n_bins=n_bins, strategy="uniform")
     if ax is None:
         fig, ax = plt.subplots()
@@ -55,7 +56,7 @@ def calibration_metrics(y_true, y_prob, n_bins=10):
     """ECE and MCE."""
     bins = np.linspace(0, 1, n_bins + 1)
     bin_ids = np.digitize(y_prob, bins) - 1
-    bin_ids = np.clip(bin_ids, 0, n_bins - 1)
+    bin_ids = np.clip(bin_ids, 0, n_bins - 1)  # a probability of exactly 1.0 would fall in bin n_bins
     ece, mce = 0.0, 0.0
     n = len(y_true)
     for b in range(n_bins):
