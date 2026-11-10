@@ -8,9 +8,7 @@
 
 ## 1. Scope & Objective
 
-Traditional retail micro-lending risk architectures evaluate credit risk purely at origination (application scorecard). However, thin-file and gig-economy portfolios exhibit dynamic delinquency paths driven by income volatility, seasonal cash flows, and macroeconomic shocks.
-
-This module provides institutional-grade portfolio risk capabilities covering:
+This module provides institutional-grade portfolio risk modeling capabilities covering:
 1. **Markov-Chain Transition Matrices & Roll Rates** (`src/transition_matrix.py`)
 2. **Ind AS 109 / IFRS 9 Staged Expected Credit Loss (ECL)** (`src/ecl_engine.py`)
 3. **Regulatory Macroeconomic Supervisory Stress Testing** (`src/stress_testing.py`)
