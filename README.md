@@ -1,7 +1,7 @@
 # IntelliCredit: FinTech Micro-Lending Risk & Alternative Credit Scoring Engine
 
-> **Capstone Project — Business Analytics (Review 1 + Review 2)**
-> Private Review 2 repository. Review 1 lives in the team repo [Darun1017/credit-scoring-engine](https://github.com/Darun1017/credit-scoring-engine).
+> **Capstone Project — Business Analytics (Review 1, Review 2 and Review 3)**
+> Private repository for Reviews 2 and 3. Review 1 lives in the team repo [Darun1017/credit-scoring-engine](https://github.com/Darun1017/credit-scoring-engine).
 > An end-to-end risk analytics engine for thin-file and gig-economy borrowers: programmatic transaction data, **live macroeconomic APIs**, interpretable default prediction, association-rule warning patterns, portfolio default forecasting, and an interactive loan-underwriter dashboard.
 
 ---
@@ -42,7 +42,7 @@
 | Method 2 (Association Rules): data preparation & implementation | **2** | `07_R2_M2` Parts A–B, `models/arm_model_comparison.csv` |
 | Method 2: evaluation & interpretation | **3** | `07_R2_M2` Parts C–F, `models/association_rules.csv` |
 | Combined business insights & recommendations | **2** | `08_R2` Section 5, `reports/Review_2_Final_Report.md` |
-| Interactive dashboard or website (Mandatory) | **5** | `dashboard/app.py` (Streamlit 5-tab engine + Dataset Explorer) + `reports/interactive_dashboard.html` |
+| Interactive dashboard or website (Mandatory) | **5** | `dashboard/app.py` (Streamlit, 11 tabs: see [Review 3](#review-3--proof-data-explorer-business-analytics-and-scenario-lab) and [Dashboard](#dashboard)) + `reports/interactive_dashboard.html` |
 | Presentation & individual contribution | **3** | [Individual Contributions](#individual-contributions), `reports/project_management_and_contributions.md`, `reports/Review_2_Presentation_Slides.md` |
 | **Total** | **20** | |
 
@@ -115,6 +115,38 @@ Research evidence (72 verified sources, 29 open-access PDFs, benchmark tables, r
 
 ---
 
+## Review 3 — Proof, Data Explorer, Business Analytics and Scenario Lab
+
+The panel asked *"how do we know these numbers are real, and does the synthetic data behave like real data?"* Three new dashboard tabs and a re-runnable validation suite answer it. Nothing in them is typed in: every table is read from a file.
+
+| Dashboard tab | What it does | Computed from |
+|---|---|---|
+| **Proof & comparison** | The pipeline on 4 real credit datasets, realism tests of the synthetic data, comparison with published studies and existing products | `models/validation/*.csv`, `research/competitive_landscape.json` |
+| **Data explorer** | Browse, filter, profile and chart all 8 datasets; trace one borrower's 12 months | files in `data/` and `models/` |
+| **Business analytics** | Segment economics, what an approval rule is worth, risk deciles, pricing against risk, portfolio vintages | `data/borrower_profiles.csv`, the 6,000 test borrowers, `data/portfolio/loan_book.csv` |
+| **Scenario lab** | Live what-if on the economy: forecast, expected credit loss, lending decisions and profit | SARIMAX refitted in `dashboard/scenario_core.py`; presets reproduce `models/ts_forecast_scenarios.csv` exactly |
+
+```bash
+python scripts/run_validation_suite.py      # about 7 minutes; downloads 4 public datasets from OpenML into data/real/benchmarks (git-ignored)
+python scripts/build_fidelity_anchors.py    # synthetic statistics against published Indian figures
+```
+
+| Same model recipe, 5-fold cross-validation | Rows | Default rate | AUC |
+|---|---:|---:|---:|
+| German credit (UCI Statlog) | 1,000 | 30.0% | 0.793 |
+| Taiwan credit cards (UCI) | 30,000 | 22.1% | 0.786 |
+| Give Me Some Credit (Kaggle) | 150,000 | 6.7% | 0.866 |
+| FICO HELOC (xML Challenge) | 10,459 | 52.2% | 0.794 |
+| **IntelliCredit (simulated)** | 30,000 | 7.9% | **0.748** (hold-out 0.741) |
+
+* The pipeline works on real credit data, and the simulated data is not unrealistically easy: it scores below all four real datasets.
+* **Risk drivers:** 5 of 9 testable drivers point the same way as in real data (late payments, on-time share, loan size, track record, savings). Age, dependents and debt burden are negligible in the simulation, and **income runs the wrong way** (richer simulated borrowers look riskier, because loan size scales with income).
+* **Alternative data:** a conventional form-plus-history scorecard reaches AUC 0.701; adding the alternative data reaches 0.748 (+4.8 points; Berg et al. 2020 report +5.3 on real data). This effect is built into the simulation, so it shows the mechanism, not proof.
+* **Business value:** the break-even rule earns Rs 245 lakh on the 6,000 test borrowers, against Rs 200 lakh for the best single risk cut-off and Rs 35 lakh for approving everyone.
+* **Not proven:** performance on real Indian gig-worker borrowers. No open data exists. The one real Indian fintech study reports AUC 0.60, so expect lower accuracy on real borrowers.
+
+---
+
 ## Architecture
 
 ```mermaid
@@ -141,10 +173,13 @@ flowchart LR
 ## Repository Structure
 
 ```text
-credit-scoring-engine/
+intellicredit-review2/
 ├── README.md
 ├── requirements.txt
-├── data_generation.py                  # synthetic borrowers + transactions (Review 1 data)
+├── data_generation.py                  # synthetic borrowers + transactions (seed 42)
+├── GITHUB_BOARD_SETUP.md               # how the issues, sprint milestones and status labels were set up
+├── create_github_board.py              # script that creates the GitHub issues / project board
+├── .streamlit/config.toml              # dashboard theme (plain paper style)
 ├── src/
 │   ├── config.py                       # shared paths, ordinal maps, seeds
 │   ├── macro_api.py                    # FRED + World Bank collector (cached, with fallback)
@@ -154,10 +189,13 @@ credit-scoring-engine/
 │   ├── real_data.py                    # IMF, World Bank, FRED, HMDA, CFPB collectors (cached, provenance)
 │   └── recourse.py                     # counterfactual path-to-approval
 ├── data/
-│   ├── borrower_profiles.csv · monthly_transactions.csv · macroeconomic_indicators.csv · data_dictionary.txt
+│   ├── borrower_profiles.csv · monthly_transactions.csv · macroeconomic_indicators.csv
+│   ├── data_dictionary.txt · data_dictionary_review2.md · DATASET_VALIDATION_SUMMARY.md
 │   ├── processed/                      # outputs of M1 & M3 (cleaned data, train/test, SMOTE)
-│   ├── external/                       # API data, raw API responses, provenance
-│   └── portfolio/                      # loan_book, loan_performance, portfolio_monthly
+│   ├── external/                       # live macro data, raw API responses, provenance
+│   ├── portfolio/                      # loan_book, loan_performance, portfolio_monthly
+│   ├── real/                           # IMF, World Bank, FRED, HMDA, CFPB data (+ benchmarks/, git-ignored downloads)
+│   └── sample/                         # small samples of every table
 ├── notebooks/
 │   ├── 01_M1_data_cleaning_preprocessing.ipynb
 │   ├── 02_M2_exploratory_data_analysis.ipynb
@@ -168,10 +206,21 @@ credit-scoring-engine/
 │   ├── 07_R2_M2_association_rule_mining.ipynb      # Review 2 · Method 2
 │   ├── 08_R2_combined_insights_dashboard.ipynb     # combined insights + Plotly visuals
 │   └── 09_R3_real_data_validation.ipynb            # REAL data: IMF/World Bank/FRED/HMDA/CFPB + conformal
-├── dashboard/app.py                    # Streamlit loan-underwriter dashboard
+├── dashboard/
+│   ├── app.py                          # Streamlit app: 11 tabs, shared decision function
+│   ├── explorer_tab.py                 # Data explorer
+│   ├── business_tab.py                 # Business analytics
+│   ├── scenario_tab.py · scenario_core.py   # Scenario lab and its SARIMAX engine
+│   └── validation_tab.py               # Proof & comparison
 ├── models/                             # model comparison, forecasts, rules, dashboard model
-├── reports/                            # interactive_dashboard.html, dashboard screenshots
+│   ├── real/                           # notebook 09 results
+│   └── validation/                     # validation-suite outputs read by the dashboard
+├── reports/                            # final report draft, interactive HTML, screenshots, figures
+├── research/                           # 72 sources, 29 PDFs, benchmark tables, competitive_landscape.json
 └── scripts/
+    ├── run_validation_suite.py         # Review 3: real-data benchmark and realism tests
+    ├── build_fidelity_anchors.py       # synthetic statistics vs published figures
+    ├── build_final_report.py           # builds the DOCX report from saved outputs
     ├── Review_1_Data_Analysis_and_Predictive_Modeling.ipynb   # condensed Review 1 notebook
     └── generators/                     # scripts that build the notebooks
 ```
@@ -192,12 +241,18 @@ python -m src.macro_api                   # live FRED + World Bank data (add --o
 python -m src.portfolio_simulation        # macro-driven loan book
 python -m src.underwriting_model          # calibrated PD model for the dashboard
 
-# 2. Notebooks, in order: 01 -> 08 (each reads the previous outputs)
+# 2. Notebooks, in order: 01 -> 09 (each reads the previous outputs)
 jupyter lab
+python -m src.real_data                   # collect the real datasets that notebook 09 uses
 
-# 3. Dashboard
+# 3. Review 3 validation (optional; the dashboard already ships with its saved results)
+python scripts/run_validation_suite.py    # about 7 minutes, needs internet once
+python scripts/build_fidelity_anchors.py
+
+# 4. Dashboard (run from the repository root so the theme in .streamlit/ applies)
 streamlit run dashboard/app.py
 ```
+The dashboard opens on **Start here**, which lists a 60-second demo path. Tabs: Start here, Data explorer, Business analytics, Score applicant, Scenario lab, Test borrowers, Economy outlook, Warning patterns, Real-data check, Proof & comparison, Model & data.
 All randomness is seeded (`42` for data and models, `2026` for the loan-book simulation), so re-running reproduces every number below.
 
 ---
@@ -249,9 +304,17 @@ All randomness is seeded (`42` for data and models, `2026` for the loan-book sim
 * Point-in-time PD = PD × forecast multiplier. Under the same break-even rule, approvals move from **75%** (benign 2025 baseline) to **48%** (severe).
 
 ### Dashboard
-| Underwriter | Portfolio outlook |
+| Score applicant | Scenario lab |
 |---|---|
-| ![underwriter](reports/screenshots/dash_underwriter.png) | ![portfolio](reports/screenshots/dash_portfolio.png) |
+| ![score applicant](reports/screenshots/dash_score.png) | ![scenario lab](reports/screenshots/dash_scenario.png) |
+
+| Business analytics | Proof & comparison |
+|---|---|
+| ![business analytics](reports/screenshots/dash_business.png) | ![proof and comparison](reports/screenshots/dash_proof.png) |
+
+![data explorer](reports/screenshots/dash_explorer.png)
+
+*Earlier four-tab version of the dashboard (Review 2):* `reports/screenshots/dash_underwriter.png`, `dash_portfolio.png`, `dash_model.png`, `dash_warning.png`.
 
 ---
 
@@ -273,7 +336,8 @@ All randomness is seeded (`42` for data and models, `2026` for the loan-book sim
 
 ## Individual Contributions & Project Governance
 
-* **Project Board (Kanban & Sprint Tracking):** [GitHub Project Board — @Darun1017\'s credit-scoring-engine](https://github.com/Darun1017/credit-scoring-engine/issues?q=is%3Aissue) (19 Tasks: 10 Review 1 + 9 Review 2)
+* **Task tracking (this repo):** GitHub Issues `#2`–`#19` (18 tasks, `TSK-101` to `TSK-405`) in four closed sprint milestones, each carrying a status label (Backlog, To Do, In Progress, Review/Testing, Completed) and an assignee; setup in [GITHUB_BOARD_SETUP.md](GITHUB_BOARD_SETUP.md).
+* **Review 1 tracking:** [issues of the team repo Darun1017/credit-scoring-engine](https://github.com/Darun1017/credit-scoring-engine/issues?q=is%3Aissue) (19 tasks: 10 Review 1 + 9 Review 2).
 * **Detailed Task History & Workload Evidence:** See [reports/project_management_and_contributions.md](reports/project_management_and_contributions.md)
 * **Final Comprehensive Technical Report:** See [reports/Review_2_Final_Report.md](reports/Review_2_Final_Report.md)
 * **15-Minute Panel Presentation Slides Deck:** See [reports/Review_2_Presentation_Slides.md](reports/Review_2_Presentation_Slides.md)
@@ -284,7 +348,7 @@ All randomness is seeded (`42` for data and models, `2026` for the loan-book sim
 | **Darun R G** | @Darun11 / @Darun1017 | Tasks #2, #3, #6, #13, #18 (+ #1, #9, #10, #19) | Data architecture, synthetic generator, feature engineering, ARM data prep, dataset validation summary & real-world benchmarks | Overall Dataset Description & Validation, Baseline ML Pipeline (Unit 1 & 2) | data_generation.py, notebooks/01-05, data/DATASET_VALIDATION_SUMMARY.md |
 | **goldmauler** | @Goldmauler | Tasks #7, #11, #12, #13, #14, #15 (+ #1, #9, #10, #19) | **Lead — Method 1 (Time-Series) & Method 2 (ARM)**: Stationarity, STL, Granger, SARIMAX with live APIs, Apriori vs FP-Growth, 93 warning rules, combined insights | **Method 1 (5 marks) + Method 2 (5 marks)** | notebooks/06_R2_M1, notebooks/07_R2_M2, src/macro_api.py, models/arm_model_comparison.csv |
 | **Abhinav Juturu** | @abhinav-juturu | Tasks #5, #11 (+ #1, #9, #10, #19) | **Portfolio Risk Modeler & EDA**: 38 exploratory charts, hypothesis testing, loan book simulation, macro-linked DPD migration | Method 1 Data Prep, EDA & Scenario Loss (2 marks) | src/portfolio_simulation.py, notebooks/02_M2, data/portfolio/ |
-| **Gowtham Reddy** | @gowthamreddy285 | Tasks #4, #16, #17 (+ #1, #9, #10, #19) | **Interactive Dashboard & Full-Stack UI**: Data cleaning/preprocessing, production Streamlit 5-tab application, TreeSHAP waterfall charts, HTML report | **Mandatory Interactive Application (5 marks)** | dashboard/app.py, notebooks/01_M1, reports/interactive_dashboard.html |
+| **Gowtham Reddy** | @gowthamreddy285 | Tasks #4, #16, #17 (+ #1, #9, #10, #19) | **Interactive Dashboard & Full-Stack UI**: Data cleaning/preprocessing, Streamlit application (now 11 tabs), TreeSHAP waterfall charts, HTML report | **Mandatory Interactive Application (5 marks)** | dashboard/app.py, notebooks/01_M1, reports/interactive_dashboard.html |
 | **Adithya** | @adii11001 | Tasks #8, #15, #17, #19 (+ #1, #9, #10, #19) | **Business Intelligence & Technical Reporter**: Model evaluation, TreeSHAP explainability, combined insights synthesis, technical report & panel slides | **Combined Business Insights (2 marks) + Presentation Defense (3 marks)** | notebooks/05_M5, notebooks/08_R2, reports/Review_2_Final_Report.md, reports/Review_2_Presentation_Slides.md |
 
 Each member presents their designated technical module during the 15-minute panel defense (Presentation & Individual Contribution: 3 marks).
@@ -297,3 +361,5 @@ Each member presents their designated technical module during the 15-minute pane
 * World Bank indicators are annual, interpolated to monthly. CPI on FRED ends in March 2025 and is carried forward, flagged in the data.
 * The loan book's defaults come from a macro-linked hazard (a CreditPortfolioView-style logit link). The forecaster recovering that link validates the pipeline; it is not evidence about real Indian borrowers.
 * The SMOTE / class-weighted Review 1 models rank well but over-state PD (mean ≈ 40% vs 7.9% observed). The dashboard therefore uses a separately calibrated model.
+* Known gaps in the synthetic data, found by the Review 3 validation: higher income looks *riskier* (loan size scales with income and the generator charges risk per rupee borrowed), debt burden, age and dependents carry almost no effect, interest rates are set independently of risk, and the simulated monthly default series is far noisier than real bank series. They are listed in the dashboard's **Proof & comparison** tab and in [`data/DATASET_VALIDATION_SUMMARY.md`](data/DATASET_VALIDATION_SUMMARY.md) §9.
+* The Review 3 validation shows the **method** works on real credit data (four public datasets) and real macro series. It does not show how the model would perform on real Indian gig-worker borrowers, for which no open data exists.
