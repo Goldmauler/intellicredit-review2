@@ -1,0 +1,55 @@
+{
+  "description": "Point-in-time PD multiplier = forecast portfolio default rate / model-implied neutral-economy rate",
+  "neutral_default_rate_pct": 0.4854,
+  "historical_mean_default_rate_pct": 0.7426,
+  "model": "SARIMAX(1, 0, 1)x(1, 0, 0, 12) + ['unemployment_rate_l2', 'gdp_growth_l2', 'cpi_inflation_yoy_l2', 'call_money_rate_l2', 'inr_depreciation_yoy_l2', 'covid_lockdown_l2', 'covid_second_wave_l2']",
+  "multipliers_next_12m": {
+    "Baseline": 0.567,
+    "Adverse": 0.689,
+    "Severe": 1.526
+  },
+  "monthly_forecast_pct": {
+    "Baseline": [
+      0.3752,
+      0.3109,
+      0.3328,
+      0.2549,
+      0.2975,
+      0.226,
+      0.2496,
+      0.2716,
+      0.2558,
+      0.2788,
+      0.2344,
+      0.2133
+    ],
+    "Adverse": [
+      0.3752,
+      0.3109,
+      0.3328,
+      0.2549,
+      0.3337,
+      0.2842,
+      0.3521,
+      0.3832,
+      0.3609,
+      0.3933,
+      0.3306,
+      0.3009
+    ],
+    "Severe": [
+      0.3752,
+      0.3109,
+      0.3328,
+      0.2549,
+      0.38,
+      1.9161,
+      2.7029,
+      0.5658,
+      0.533,
+      0.5808,
+      0.4883,
+      0.4443
+    ]
+  }
+}

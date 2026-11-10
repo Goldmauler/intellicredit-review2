@@ -1,0 +1,85 @@
+{
+  "generated_at": "2026-10-04T08:40:39+00:00",
+  "columns": {
+    "cpi_inflation_yoy": {
+      "api": "FRED",
+      "series_id": "CPALTT01INM659N",
+      "description": "CPI all items, % change vs same month previous year (OECD MEI)",
+      "origin": "live",
+      "url": "https://fred.stlouisfed.org/series/CPALTT01INM659N",
+      "first_obs": "1958-01-01",
+      "last_obs": "2025-03-01"
+    },
+    "call_money_rate": {
+      "api": "FRED",
+      "series_id": "IRSTCI01INM156N",
+      "description": "Immediate interbank (call money) rate, % p.a.",
+      "origin": "live",
+      "url": "https://fred.stlouisfed.org/series/IRSTCI01INM156N",
+      "first_obs": "1968-01-01",
+      "last_obs": "2026-07-01"
+    },
+    "gsec_10y_yield": {
+      "api": "FRED",
+      "series_id": "INDIRLTLT01STM",
+      "description": "10-year government bond yield, % p.a.",
+      "origin": "live",
+      "url": "https://fred.stlouisfed.org/series/INDIRLTLT01STM",
+      "first_obs": "2011-12-01",
+      "last_obs": "2026-07-01"
+    },
+    "inr_per_usd": {
+      "api": "FRED",
+      "series_id": "EXINUS",
+      "description": "Indian rupees per US dollar, monthly average",
+      "origin": "live",
+      "url": "https://fred.stlouisfed.org/series/EXINUS",
+      "first_obs": "1973-01-01",
+      "last_obs": "2026-09-01"
+    },
+    "unemployment_rate": {
+      "api": "World Bank",
+      "indicator_id": "SL.UEM.TOTL.ZS",
+      "description": "Unemployment, % of labour force (ILO modelled)",
+      "origin": "live",
+      "url": "https://data.worldbank.org/indicator/SL.UEM.TOTL.ZS?locations=IN",
+      "frequency_note": "annual values anchored at July and linearly interpolated to months",
+      "years": "2010-2025"
+    },
+    "gdp_growth": {
+      "api": "World Bank",
+      "indicator_id": "NY.GDP.MKTP.KD.ZG",
+      "description": "Real GDP growth, annual %",
+      "origin": "live",
+      "url": "https://data.worldbank.org/indicator/NY.GDP.MKTP.KD.ZG?locations=IN",
+      "frequency_note": "annual values anchored at July and linearly interpolated to months",
+      "years": "2010-2025"
+    },
+    "lending_rate": {
+      "api": "World Bank",
+      "indicator_id": "FR.INR.LEND",
+      "description": "Commercial bank lending rate, %",
+      "origin": "live",
+      "url": "https://data.worldbank.org/indicator/FR.INR.LEND?locations=IN",
+      "frequency_note": "annual values anchored at July and linearly interpolated to months",
+      "years": "2010-2022"
+    },
+    "covid_lockdown": {
+      "api": "event-calendar",
+      "months": [
+        "2020-03",
+        "2020-04",
+        "2020-05",
+        "2020-06"
+      ]
+    },
+    "covid_second_wave": {
+      "api": "event-calendar",
+      "months": [
+        "2021-04",
+        "2021-05",
+        "2021-06"
+      ]
+    }
+  }
+}
