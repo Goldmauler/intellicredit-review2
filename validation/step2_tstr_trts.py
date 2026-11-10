@@ -87,6 +87,7 @@ def ks_statistic(y_true, y_prob):
 
 
 def compute_metrics(y_true, y_prob, label=""):
+    """Discrimination (AUC, PR-AUC, KS) and calibration (Brier, ECE) metrics for one experiment arm."""
     auc = roc_auc_score(y_true, y_prob)
     pr_auc = average_precision_score(y_true, y_prob)
     brier = brier_score_loss(y_true, y_prob)
@@ -137,12 +138,14 @@ def _load_uci_mapped():
 
 
 def train_and_predict(X_train, y_train, X_test):
+    """Fit a fresh LightGBM with the shared LGB_PARAMS; return (test probabilities, fitted model)."""
     model = lgb.LGBMClassifier(**LGB_PARAMS)
     model.fit(X_train, y_train)
     return model.predict_proba(X_test)[:, 1], model
 
 
 def run_experiments():
+    """Train-on-synthetic/test-on-real (TSTR) and the reverse (TRTS), plus both in-domain baselines."""
     print("=" * 60)
     print("  Step 2: TSTR / TRTS Cross-Train Experiments")
     print("=" * 60)
